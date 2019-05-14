@@ -1,0 +1,5 @@
+[book]
+authors = ["Naja Melan"]
+multilingual = false
+src = "src"
+title = "Thespis User Guide"
