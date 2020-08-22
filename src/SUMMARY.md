@@ -1,3 +1,11 @@
 # Summary
 
-- [Chapter 1](./chapter_1.md)
+- [Introduction](introduction.md)
+- [What is the actor model?](actor_model.md)
+- [What is thespis?](what_is_thespis.md)
+- [Pitfalls Checklist](pitfalls.md)
+
+- [thespis_impl](thespis_impl/thespis_impl.md)
+  - [Desugar Addr::builder()](thespis_impl/desugar.md)
+
+- [thespis_remote](thespis_remote/introduction.md)
