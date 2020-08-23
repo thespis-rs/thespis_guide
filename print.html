@@ -97,7 +97,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="actor_model.html"><strong aria-hidden="true">2.</strong> What is the actor model?</a></li><li class="chapter-item expanded "><a href="what_is_thespis.html"><strong aria-hidden="true">3.</strong> What is thespis?</a></li><li class="chapter-item expanded "><a href="pitfalls.html"><strong aria-hidden="true">4.</strong> Pitfalls Checklist</a></li><li class="chapter-item expanded "><a href="thespis_impl/thespis_impl.html"><strong aria-hidden="true">5.</strong> thespis_impl</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="thespis_impl/desugar.html"><strong aria-hidden="true">5.1.</strong> Desugar Addr::builder()</a></li><li class="chapter-item expanded "><a href="thespis_impl/supervision.html"><strong aria-hidden="true">5.2.</strong> Supervising an actor</a></li><li class="chapter-item expanded "><a href="thespis_impl/concurrent.html"><strong aria-hidden="true">5.3.</strong> Processing messages concurrently</a></li></ol></li><li class="chapter-item expanded "><a href="thespis_remote/introduction.html"><strong aria-hidden="true">6.</strong> thespis_remote</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="actor_model.html"><strong aria-hidden="true">2.</strong> What is the actor model?</a></li><li class="chapter-item expanded "><a href="what_is_thespis.html"><strong aria-hidden="true">3.</strong> What is thespis?</a></li><li class="chapter-item expanded "><a href="pitfalls.html"><strong aria-hidden="true">4.</strong> Pitfalls Checklist</a></li><li class="chapter-item expanded "><a href="thespis_impl/thespis_impl.html"><strong aria-hidden="true">5.</strong> thespis_impl</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="thespis_impl/desugar.html"><strong aria-hidden="true">5.1.</strong> Desugar Addr::builder()</a></li><li class="chapter-item expanded "><a href="thespis_impl/supervision.html"><strong aria-hidden="true">5.2.</strong> Supervising an actor</a></li><li class="chapter-item expanded "><a href="thespis_impl/concurrent.html"><strong aria-hidden="true">5.3.</strong> Processing messages concurrently</a></li><li class="chapter-item expanded "><a href="thespis_impl/abstraction.html"><strong aria-hidden="true">5.4.</strong> Abstract the Actor type</a></li></ol></li><li class="chapter-item expanded "><a href="thespis_remote/introduction.html"><strong aria-hidden="true">6.</strong> thespis_remote</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -757,6 +757,57 @@ async fn main() -&gt; Result&lt; (), DynError &gt;
    Ok(())
 }
 </code></pre></pre>
+<h1><a class="header" href="#abstract-the-actor-type" id="abstract-the-actor-type">Abstract the Actor type</a></h1>
+<p>The last chapters cover the most straight forward use of thespis. But how does it all compose? What if need to store a list of addresses to different actors that accept a certain type of message? What if I have to send 2 different message types to this heterogeneous list? <code>Addr</code> is actually <code>Addr&lt;A&gt;</code>. It's generic over a type of actor, thus it can send all the message types this actor implements <code>Handler</code> for, but that does mean we can not store a list of addresses to different actors.</p>
+<p>The solution to this is the trait <code>Address&lt;M&gt;</code> from the interface library <em>thespis</em>. We can store a <code>Box&lt; dyn Address&lt;M, Error=E&gt; + Send + Unpin &gt;</code> and thus we can store addresses to different actors in the same collection. Because this type is unwieldy, thespis has a shorthand: <code>BoxAddress&lt;M, E&gt;</code>. The error type comes from the channel Sender. <em>thespis_impl</em> wraps the errors from different channels in <code>ThesErr</code>, so generally if you use the <code>Addr</code> type, that's the error type you should use.</p>
+<p>Of course, if your actor types are known at compile time and you don't have to many of them you can also use an enum:</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>enum Postman
+{
+   Foo( Addr&lt;Foo&gt; ),
+   Bar( Addr&lt;Bar&gt; ),
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p>However, you will have to match and de-structure the enum to actually send anything. And mind you that sometimes boxing doesn't have any measurable overhead, so the inconvenience might well not be worth it.</p>
+<h1><a class="header" href="#multi-dimensional" id="multi-dimensional">Multi dimensional</a></h1>
+<p>But what if you have several message types and you will have to send them to several types of actors? Unfortunately we <a href="https://github.com/rust-lang/rfcs/issues/2035">cannot currently express</a> <code>Box&lt; dyn Address&lt;Foo&gt; + Address&lt;Bar&gt; &gt;</code> in rust. There is a piece of boilerplate that solves this however:</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>struct Foo;
+struct Bar;
+
+impl Message for Foo { type Return = (); }
+impl Message for Bar { type Return = (); }
+
+
+trait AddressFooBar: Address&lt;Foo, Error=ThesErr&gt; + Address&lt;Bar, Error=ThesErr&gt; {}
+
+impl&lt;T&gt; AddressFooBar for T
+
+   where Self: Address&lt;Foo, Error=ThesErr&gt; + Address&lt;Bar, Error=ThesErr&gt;
+{}
+<span class="boring">}
+</span></code></pre></pre>
+<p>Now we can have <code>Box&lt; dyn AddressFooBar &gt;</code> and be able to send both <code>Foo</code> and <code>Bar</code> messages.</p>
+<h1><a class="header" href="#unknown-unknowns" id="unknown-unknowns">Unknown unknowns</a></h1>
+<p>Sometimes it's not even known in your library which types of actors and which types of messages you will have to handle, because they are user defined. Yet you still need to store a bunch addresses. You will have some other information at runtime which will indicate which type the actor and message are.</p>
+<p>In this case you can store the addresses as <code>Box&lt; dyn Any &gt;</code> and then downcast them at runtime to the right type. However, we cannot cross cast to another trait object, so we need an actual struct. <em>thespis_impl</em> actually provides such a struct for you. It's defined as:</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct Receiver&lt;M: Message&gt;
+{
+   rec: BoxAddress&lt;M, ThesErr&gt;
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p>It's just a simple wrapper around a boxed address that re-implements the relevant traits so you can use it directly as an address.</p>
+<h1><a class="header" href="#cloning-trait-objects" id="cloning-trait-objects">Cloning trait objects</a></h1>
+<p>The clone trait is not object safe in Rust, so you can't make a trait object from a trait that requires implementers to also implement <code>Clone</code>. For this reason, the <code>Address</code> trait has a <code>clone_box</code> method that requires implementors to be able to produce a <code>BoxAddress&lt;M&gt;</code>. This way if you have a boxed address you can still clone it conveniently.</p>
 <h1><a class="header" href="#introduction-to-thespis_remote" id="introduction-to-thespis_remote">Introduction to thespis_remote.</a></h1>
 <p><em>Thespis_remote</em> adds support for remote actors to the thespis actor model. It follows the same rather low level approach as the rest of <em>thespis</em>. That means it provides the ability to send actor messages over one connection. The connection <em>thespis_remote</em> works over is a <code>Sink</code> and <code>Stream</code> of a given wire format. This with an encoder/decoder it works over anything that implements <code>AsyncRead</code>/<code>AsyncWrite</code>.</p>
 <p>There is no &quot;system&quot; or discovery integrated. It requires you to connect two processes by any means of your choice and provide the above interfaces to <em>thespis_remote</em>. From there <em>thespis_remote</em> provides:</p>
