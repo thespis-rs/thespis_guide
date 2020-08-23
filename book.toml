@@ -1,5 +1,8 @@
 [book]
-authors = ["Naja Melan"]
+authors      = [ "Naja Melan <najamelan@autistici.org>" ]
 multilingual = false
-src = "src"
-title = "Thespis User Guide"
+src          = "src"
+title        = "Thespis User Guide"
+
+[output.html]
+additional-css = ["custom.css"]

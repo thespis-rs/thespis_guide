@@ -5,10 +5,10 @@ This is the reference implementation. This chapter goes over it's features and p
 ```rust
 use
 {
-	thespis         :: { *            } ,
-	thespis_impl    :: { *            } ,
-	async_executors :: { AsyncStd     } ,
-	std             :: { error::Error } ,
+   thespis         :: { *            } ,
+   thespis_impl    :: { *            } ,
+   async_executors :: { AsyncStd     } ,
+   std             :: { error::Error } ,
 };
 
 
@@ -21,16 +21,16 @@ struct Hello( String );
 
 impl Message for Hello
 {
-	type Return = String;
+   type Return = String;
 }
 
 
 impl Handler< Hello > for MyActor
 {
-	#[async_fn]	fn handle( &mut self, _msg: Hello ) -> String
-	{
-		"world".into()
-	}
+   #[async_fn] fn handle( &mut self, _msg: Hello ) -> String
+   {
+      "world".into()
+   }
 }
 
 
@@ -38,13 +38,13 @@ impl Handler< Hello > for MyActor
 //
 async fn main() -> Result< (), Box<dyn Error> >
 {
-	let mut addr = Addr::builder().start( MyActor, &AsyncStd )?;
+   let mut addr = Addr::builder().start( MyActor, &AsyncStd )?;
 
-	let result = addr.call( Hello( "hello".into() ) ).await?;
+   let result = addr.call( Hello( "hello".into() ) ).await?;
 
-	assert_eq!( "world", result );
+   assert_eq!( "world", result );
 
-	Ok(())
+   Ok(())
 }
 ```
 
@@ -65,7 +65,7 @@ struct Hello( String );
 
 impl Message for Hello
 {
-	type Return = String;
+   type Return = String;
 }
 ```
 
@@ -76,16 +76,16 @@ The associated type is the return type of the handler. When using `Addr::call` y
 ```rust
 impl Handler< Hello > for MyActor
 {
-	#[async_fn]	fn handle( &mut self, _msg: Hello ) -> String
-	{
-		"world".into()
-	}
+   #[async_fn] fn handle( &mut self, _msg: Hello ) -> String
+   {
+      "world".into()
+   }
 }
 ```
 
-Here we define that `MyActor` can process messages of type `Hello`. The body of the function does the actual processing. As you can see it receives a `&mut self`, even though we know that all messages are sent asynchronously. This is the main advantage of the actor model. Even though any place in your code that has this actor's address can easily send messages, you never need thread sync like locks on your data. Only this actor can access it's own state directly and the only way to communicate with it is through sending messages. Further more the mailbox will make the actor process one message at a time, so there is never shared mutual access the the state.
+Here we define that `MyActor` can process messages of type `Hello`. The body of the function does the actual processing. As you can see it receives a `&mut self`, even though we know that all messages are sent asynchronously. This is the main advantage of the actor model. Even though any place in your code that has this actor's address can easily send messages, you never need thread sync like locks on your data. Only this actor can access it's own state directly and the only way to communicate with it is through sending messages. Further more the mailbox will make the actor process one message at a time, so there is never shared mutual access to the state.
 
-Using plain Object Oriented Programming in async Rust with methods that access state is very difficult, since as soon as you spawn any task, that task cannot hold any references to anything outside of it and to make matters worse, you can never hold a mutex across an await point.
+Using plain Object Oriented Programming in async Rust with methods that access state is very difficult, since as soon as you spawn any task, that task cannot hold any references to anything outside of it and to make matters worse, you shouldn't hold a mutex across an await point. The actor model sidesteps these problems, as any code that needs to communicate with an actor only needs the address, not a reference to the actor itself. `Addr` implements clone, so you can have many places of your program talk to the actor.
 
 The `async_fn` macro deals with the fact that Rust doesn't support async trait methods at the moment. It does this in a very similar way as the _async-trait_ crate, but it outputs much simpler code, making it compatible with a hand written version of this method, which was not possible with _async-trait_.
 
@@ -94,13 +94,13 @@ A handwritten version would look like:
 ```rust
 impl Handler< Hello > for MyActor
 {
-	fn handle( &mut self, _msg: Hello ) -> Return<'_, String>
-	{
-		Box::pin( async
-		{
-			"world".into()
-		})
-	}
+   fn handle( &mut self, _msg: Hello ) -> Return<'_, String>
+   {
+      Box::pin( async
+      {
+         "world".into()
+      })
+   }
 }
 ```
 
@@ -130,8 +130,8 @@ Note that this function takes our actor by value as we shouldn't access it anymo
 let result = addr.call( Ping( "hello".into() ) ).await?;
 ```
 
-We use `Address::call` to send a message to our actor. This method will return to us a future that will resolve to the answer our handler returns. Note that `Addr` also implements `futures_sink::Sink`. The `send` method from the `Sink` trait will drop the returned value and will return to us as soon as the message is delivered to the mailbox, without waiting for the actor to process the message.
+We use `Address::call` to send a message to our actor. This method will return to us a future that will resolve to the answer our handler returns. Note that `Addr` also implements `futures_sink::Sink`. You can use the combinators from the futures crate to forward an entire stream into the address, as long as the actor implements `Handler` for the type the stream produces. The `send` method from the `Sink` trait will drop the returned value and will return to us as soon as the message is delivered to the mailbox, without waiting for the actor to process the message.
 
-Thus you can also use the `call` method even if you don't want to return any value to be sure that the message has been processed, where as `send` is more like throwing a message in a bottle. You will still get back pressure from `send` as it will block when the channel between the `Addr` and the mailbox is full.
+Thus you can also use the `call` method even if you don't want to return any value to be sure that the message has been processed, where as `send` is more like throwing a message in a bottle. You will still get back pressure from `send` as it will block when the channel between the `Addr` and the mailbox is full (as long as it's not an unbounded channel that is).
 
 In the next chapter we will take a look at desugaring the builder and manually create our mailbox and address.
