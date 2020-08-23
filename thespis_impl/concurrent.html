@@ -163,6 +163,7 @@
                     <main>
                         <h1><a class="header" href="#processing-messages-concurrently" id="processing-messages-concurrently">Processing messages concurrently</a></h1>
 <p>In principle an actor processes one message at a time. This restriction only makes sense however if the actor has mutable state. This avoids all synchronization problems. But what if your actor doesn't have mutable state? In that case we can process messages concurrently without any issues.</p>
+<p>The following example shows how you can tie the lifetime of the sub-tasks to the lifetime of the actor by using a nursery:</p>
 <pre><pre class="playground"><code class="language-rust">use
 {
    thespis           :: { *                                                 } ,
