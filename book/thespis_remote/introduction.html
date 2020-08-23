@@ -1,0 +1,254 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>thespis_remote - Thespis User Guide</title>
+        
+        
+
+
+        <!-- Custom HTML head -->
+        
+
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        
+        <link rel="icon" href="../favicon.svg">
+        
+        
+        <link rel="shortcut icon" href="../favicon.png">
+        
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        
+        <link rel="stylesheet" href="../fonts/fonts.css">
+        
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../actor_model.html"><strong aria-hidden="true">2.</strong> What is the actor model?</a></li><li class="chapter-item expanded "><a href="../what_is_thespis.html"><strong aria-hidden="true">3.</strong> What is thespis?</a></li><li class="chapter-item expanded "><a href="../pitfalls.html"><strong aria-hidden="true">4.</strong> Pitfalls Checklist</a></li><li class="chapter-item expanded "><a href="../thespis_impl/thespis_impl.html"><strong aria-hidden="true">5.</strong> thespis_impl</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../thespis_impl/desugar.html"><strong aria-hidden="true">5.1.</strong> Desugar Addr::builder()</a></li></ol></li><li class="chapter-item expanded "><a href="../thespis_remote/introduction.html" class="active"><strong aria-hidden="true">6.</strong> thespis_remote</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">Thespis User Guide</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#introduction-to-thespis_remote" id="introduction-to-thespis_remote">Introduction to thespis_remote.</a></h1>
+<p><em>Thespis_remote</em> adds support for remote actors to the thespis actor model. It follows the same rather low level approach as the rest of <em>thespis</em>. That means it provides the ability to send actor messages over one connection. The connection <em>thespis_remote</em> works over is a <code>Sink</code> and <code>Stream</code> of a given wire format. This with an encoder/decoder it works over anything that implements <code>AsyncRead</code>/<code>AsyncWrite</code>.</p>
+<p>There is no &quot;system&quot; or discovery integrated. It requires you to connect two processes by any means of your choice and provide the above interfaces to <em>thespis_remote</em>. From there <em>thespis_remote</em> provides:</p>
+<ul>
+<li><code>RemoteAddr</code> which allows you to send messages as if you were sending to an actor in the same process.</li>
+<li><code>ServiceMap</code>, a trait and provided reference impl that knows how to deserialize your actor messages and dispatch them to the right actor. Note that you can only set one actor per message type per service map, so you are actually sending to a remote process rather than to an individual actor in that process. However you can easily wrap your message with an actor id and provide more precise delivery if you want.</li>
+<li><code>WireFormat</code>, a trait and reference impl for the actual wire format used.</li>
+<li><code>Peer</code>, an actor that manages a connection endpoint. You provide it with a service map to &quot;serve&quot; over the connection and you pass it when you create <code>RemoteAddr</code> stating that you know that the other side of the connection managed by this <code>Peer</code> exposes the services you</li>
+</ul>
+<p>These are the four core components of the library.</p>
+<p><em>thespis_remote</em> also provides relaying of messages. Further some features are included to deal with back pressure and to make it resistant to attacks like DOS and slow loris.</p>
+<p>Apart from this guide you can also consult the <a href="https://docs.rs/thespis_remote">API documentation</a> and the <a href="https://github.com/thespis-rs/thespis_remote/tree/master/examples">examples</a>.</p>
+<h1><a class="header" href="#design" id="design">Design</a></h1>
+<p>You might feel cheated that you can't address individual actors on a remote process. There are good reasons for this however and nothing stops you from implementing this functionality on top of <em>thespis_remote</em>. In <em>thespis</em> everything is as much as possible statically type checked. By considering a process that exposes it's possibility to receive messages of certain types, we adhere to a public interface like a contract. It allows a remote process to statically create addresses to send us messages, rather than having to send over addresses at runtime.</p>
+<p>Actors can accept several types of messages, but some of those might not be meant for external use. If we were to expose an address to this actor as is, all of it's interface would be remotely exposed. We would also need to compile in the actor type in the remote process, where with the current design only message types need to be shared between the two processes.</p>
+<p><em>thespis_remote</em> is minimal in the sense that it creates the fundamental building block for remote actor communication. Systems, discovery and individual actor addressing can all be implemented on top of it.</p>
+<p>Several components of the library can easily be customized. The traits <code>WireFormat</code> and <code>ServiceMap</code> allow you to create your own specialized implementations if desired.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="../thespis_impl/desugar.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a rel="prev" href="../thespis_impl/desugar.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+            </nav>
+
+        </div>
+
+        
+        <!-- Livereload script (if served using the cli tool) -->
+        <script type="text/javascript">
+            var socket = new WebSocket("ws://localhost:3000/__livereload");
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
+        
+
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

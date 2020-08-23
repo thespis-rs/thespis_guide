@@ -1,0 +1,272 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Pitfalls Checklist - Thespis User Guide</title>
+        
+        
+
+
+        <!-- Custom HTML head -->
+        
+
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        
+        <link rel="icon" href="favicon.svg">
+        
+        
+        <link rel="shortcut icon" href="favicon.png">
+        
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="actor_model.html"><strong aria-hidden="true">2.</strong> What is the actor model?</a></li><li class="chapter-item expanded "><a href="what_is_thespis.html"><strong aria-hidden="true">3.</strong> What is thespis?</a></li><li class="chapter-item expanded "><a href="pitfalls.html" class="active"><strong aria-hidden="true">4.</strong> Pitfalls Checklist</a></li><li class="chapter-item expanded "><a href="thespis_impl/thespis_impl.html"><strong aria-hidden="true">5.</strong> thespis_impl</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="thespis_impl/desugar.html"><strong aria-hidden="true">5.1.</strong> Desugar Addr::builder()</a></li></ol></li><li class="chapter-item expanded "><a href="thespis_remote/introduction.html"><strong aria-hidden="true">6.</strong> thespis_remote</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">Thespis User Guide</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#pitfalls-checklist" id="pitfalls-checklist">Pitfalls Checklist</a></h1>
+<p>The actor model is a very convenient programming paradigm. It automatically solves many of the harder problems in concurrent software design. However, there are a few pitfalls, so here is a check list of things the compiler won't catch for us:</p>
+<h2><a class="header" href="#1deadlocks" id="1deadlocks">1.Deadlocks</a></h2>
+<p>The original actor model is very simple. If you want to have a request-response type message, you had to send your own address along with the message so the recipient knows how to respond to you. Thanks to rust's futures, we can easily create a request-response and thespis makes this convenient for you with <code>Address::call</code>. However, if you await a response whilst processing a message, a deadlock can arise.</p>
+<p>As actors only process one message at a time, if you have a cyclic dependency, your program can deadlock. That is if have actor A depending on actor B to to process it's message, but in order to process A's request B also needs to call back A, both actors will deadlock, as they are waiting on each other and will no longer process any messages ever after.</p>
+<p>You can run into this problem through intermediate actors, so A and B might not be calling each other directly.</p>
+<p>You can also run into this problem with a single actor when using bounded channels. If the mailbox of the actor is currently full and it sends itself a message, it will deadlock. You should generally spawn such a send to avoid blocking processing of the current message.</p>
+<h2><a class="header" href="#2-memory-consumption" id="2-memory-consumption">2. Memory consumption</a></h2>
+<p>The actor model has highly concurrent message passing. If many messages are in flight, they will all consume memory. The most obvious risk is having unbounded channels to communicate between address and mailbox. If there is no back pressure, the unbounded channel can use unbounded amounts of memory.</p>
+<p>But even with bounded channels you want to keep an eye on memory consumption. If you spawn large volumes of actors, you probably want to use a channel that doesn't allocate it's full capacity. Channels based on linked lists rather than array buffers could potentially reduce a lot of memory consumption.</p>
+<h2><a class="header" href="#3-performance" id="3-performance">3. Performance</a></h2>
+<p>The main downside of the actor model is a performance overhead compared to lower level approaches. Message passing has some price and depending on your application it might be a poor fit. If you have hotspots in your code, and you need to do a lot of small operations, like calling getters on other objects, the overhead of message passing might be undesirable.</p>
+<p>Remember that the purpose of this model is to have an actor for everything that you want to run concurrently. However, you can have a module for which an actor is the facade to the outside world, but internally uses a synchronous logic. You do however want to reach a critical threshold of actors. If you have CPU cores x 4 components that run concurrently and that normally are rarely blocked, eg. most of them will be able to make progress most of the time, adding more concurrency to your program might not be the most useful for performance.</p>
+<p>That being said, you shouldn't worry about it to much. Rust is a very fast language. Even with the overhead of message passing, it will be much faster than most other languages, and remember how much useful software has been written in those languages. In 99% of the time performance shouldn't be an issue.</p>
+<p>As always, first write your software with clean design, then benchmark to see if there is a problem. If there is, profile to see what's your bottleneck.</p>
+<h2><a class="header" href="#4-blocking" id="4-blocking">4. Blocking</a></h2>
+<p>We all know that async code shouldn't block. That is we shouldn't block the thread with either to much CPU intensive work, or by waiting on things like locks. That's because other tasks might also be working on the same thread.</p>
+<p>However it's important to also think about blocking the task, even if you aren't blocking the thread. An actor that <code>call</code>s another actor will not continue processing messages until that other actor sends back a response. Given that that actor might have a backlog of messages in it's queue, and it might itself wait for other actors whilst processing those, things could severely slow down. In practice this is not a problem if you have enough actors that can make progress at any given time. You will always have a maximal usage of the system's resources, but...</p>
+<p>If you have a specific bottleneck, one or two actors that are crucial in your program that can not keep up with the rest, they become the slowest link in the chain.</p>
+<p>Certain actors should spawn sub tasks rather than blocking on them. Eg. an actor that processes incoming requests from the network. If the back-end processing of those messages is async, this actor should probably continue to process other messages while the back-end generates a response. Again, it depends on the situation. If you count serving many connections concurrently and have one actor per connection, maybe it's fine for that actor to do but one thing at a time.</p>
+<p>Note that <code>send</code> also blocks the task, but only until the message has been delivered into the mailbox of the receiving actor. It doesn't wait until the message is processed, but will block if the mailbox is full.</p>
+<h2><a class="header" href="#5-backpressure" id="5-backpressure">5. Backpressure</a></h2>
+<h2><a class="header" href="#6-actor-lifetime" id="6-actor-lifetime">6. Actor Lifetime</a></h2>
+<p>Thespis follows a model very similar to the Rust memory model. The mailbox for an actor will stop running when all addresses to this actor have been dropped and all messages have been processed. This is neat, but it does oblige you to be very conscious about where addresses are lingering, or your program won't terminate, or you might have a memory leak.</p>
+<p>The initial ambition was to say an address is always valid, and thus sending can conveniently be infallible. In practice this doesn't work, since an actor might panic while processing a message. When using remote actors, the network or the remote process might go down and on top of that, most channel implementations have a fallible send.</p>
+<p>I kept this lifetime management, because usually having addresses around to actors that are no longer running is a sign of sloppy coding. But it requires extra discipline and especially be aware of actors that have their own address, or 2 actors that have addresses to each other.</p>
+<p>One way to sidestep this is to pull the plug. That is if you cancel the future running the mailbox, well it's terminated, however this is not recommended. If you really want an actor to stop it's own mailbox, regardless of other components that might still want to use it, you can let it spawn itself so it can have a JoinHandle that it can use to abort the mailbox.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="what_is_thespis.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="thespis_impl/thespis_impl.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a rel="prev" href="what_is_thespis.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a rel="next" href="thespis_impl/thespis_impl.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+        <!-- Livereload script (if served using the cli tool) -->
+        <script type="text/javascript">
+            var socket = new WebSocket("ws://localhost:3000/__livereload");
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
+        
+
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

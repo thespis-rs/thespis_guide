@@ -1,0 +1,582 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Thespis User Guide</title>
+        
+        <meta name="robots" content="noindex" />
+        
+        
+
+
+        <!-- Custom HTML head -->
+        
+
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        
+        <link rel="icon" href="favicon.svg">
+        
+        
+        <link rel="shortcut icon" href="favicon.png">
+        
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="actor_model.html"><strong aria-hidden="true">2.</strong> What is the actor model?</a></li><li class="chapter-item expanded "><a href="what_is_thespis.html"><strong aria-hidden="true">3.</strong> What is thespis?</a></li><li class="chapter-item expanded "><a href="pitfalls.html"><strong aria-hidden="true">4.</strong> Pitfalls Checklist</a></li><li class="chapter-item expanded "><a href="thespis_impl/thespis_impl.html"><strong aria-hidden="true">5.</strong> thespis_impl</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="thespis_impl/desugar.html"><strong aria-hidden="true">5.1.</strong> Desugar Addr::builder()</a></li></ol></li><li class="chapter-item expanded "><a href="thespis_remote/introduction.html"><strong aria-hidden="true">6.</strong> thespis_remote</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">Thespis User Guide</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#introduction" id="introduction">Introduction</a></h1>
+<p>This is the user guide for the Thespis actor library. The actor model is an entire programming paradigm. Thus if you have no experience with it, there is some ground to cover before becoming fluid in designing software with this model. This guide will provide you with the following information:</p>
+<ol>
+<li>Some references to good information about the actor model itself</li>
+<li>A detailed tour of both the features and the design choices of Thespis.</li>
+<li>A set of design patterns that can help you solve common problems with the actor model and more specifically with Thespis.</li>
+</ol>
+<h1><a class="header" href="#what-is-the-actor-model" id="what-is-the-actor-model">What is the actor model?</a></h1>
+<p>The actor model is a program design model tailored to asynchronous concurrent processing. It was first conceived in 1973 by Carl Hewitt.  <a href="https://en.wikipedia.org/wiki/Actor_model">Wikipedia</a> has a thorough introduction.</p>
+<p>To simplify, the actor model is an object oriented model which encapsulates not only data but also behavior. That is an actor is an object which can hold local mutable state, but other actors cannot access the state, neither call methods on the actor. The only way to interact with it is by sending it a message.</p>
+<p>This is the key advantage of the actor model. Since no direct method calls take place, there is no shared memory access. There is no need for locking as only the actor itself will be able to access it's state. The actor processes one message at a time. Thus during message processing it is always guaranteed to be the only piece of the program accessing it's state and no synchronization is needed.</p>
+<p>You might have found out that people struggle to use the OOP model in Rust. Rust doesn't allow you to cheat when it comes to memory access. The compiler is very strict and it turns out its hard to write traditional OOP with a strict compiler. When you add concurrency and multi-threading to the mix it becomes downright impractical. The actor model solves exactly this problem as memory synchronization is simple eliminated from the equation.</p>
+<p>For the rest of this book, it is assumed that you have some basic understanding of how the actor model works. If this is new for you, please check the following resources:</p>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Actor_model">Wikipedia</a></li>
+<li><a href="https://www.youtube.com/watch?v=7erJ1DV_Tlo">Everything you ever wanted to know about the actor model by Carl Hewitt</a> (video, highly recommended)</li>
+</ul>
+<p>The Thespis API is inpired by <a href="https://docs.rs/actix/">actix</a>. If you are already familiar with actix, it will be easy to pick up thespis.</p>
+<h1><a class="header" href="#what-is-thespis" id="what-is-thespis">What is thespis?</a></h1>
+<p>When working on asynchronous projects in Rust I discovered the actor model thanks to <a href="https://docs.rs/actix/">actix</a>. I immediately found the model a very good fit for both Rust and asynchronous design. I started to implement software using the actix library and soon ran into a number of issues:</p>
+<ul>
+<li>it was in futures 0.1 (has been updated by now)</li>
+<li>doesn't work on wasm</li>
+<li>documentation was lackluster</li>
+<li>code base big and complicated</li>
+<li>my reasoning didn't seem to match with the actix lead developer</li>
+</ul>
+<p>I tried briefly to evaluate what it would take to implement the features I wanted in actix, but it turned out to be complicated. Thus I set off rewriting from scratch. It has taken a long time, but I think the result is still relevant and worth it.</p>
+<p>In the mean time, so many actor libraries have popped up that I have lost track of what each one exactly offers.</p>
+<h1><a class="header" href="#features" id="features">Features</a></h1>
+<ul>
+<li><strong>work everywhere</strong>: including on wasm. Note that async rust on embedded is still in it's infancy and I have not looked into it specifically, so no promises there for now. Thespis also uses boxing extensively, which might be a problem on embedded.</li>
+<li><strong>minimal API design</strong> As an example compared to actix, there is no <em>MessageResponse</em> trait, no <em>Context</em> object, no <em>ActorFuture</em>, no DNS resolver, no <em>System</em> nor <em>Arbiter</em>, no <em>ActorStream</em>, ... The address in thespis implements the <em>Sink</em> trait, so you can easily chain it with streams. The code base (without remote actors) is about 750 SLOC.</li>
+<li><strong>full control</strong>: you can interact at a low level with the address and the mailbox of an actor, you can change their implementation for your own as long as they implement the required traits and you can even plug in the channel of your choice between the address and the mailbox.</li>
+<li><strong>remote actors</strong>: <em>thespis_remote</em> is a library that allows you to communicate with other processes and send messages to a remote process as if it was an actor in the local application. As far as I can tell, <a href="https://docs.rs/kay"><em>kay</em></a> is the only other Rust actor library that has remote actors.</li>
+<li><strong>executor agnostic</strong></li>
+<li><strong>well tested and documented</strong></li>
+</ul>
+<p>In thespis, interface and implementation are 2 different libraries. The idea is that the interface defines the contract of what an actor is in terms of the Rust type system, but that you can swap out the implementation with something else yet remain compatible with other code that uses actors. You could for example write an implementation which uses actix under the hood if you wanted to create interop.</p>
+<h1><a class="header" href="#pitfalls-checklist" id="pitfalls-checklist">Pitfalls Checklist</a></h1>
+<p>The actor model is a very convenient programming paradigm. It automatically solves many of the harder problems in concurrent software design. However, there are a few pitfalls, so here is a check list of things the compiler won't catch for us:</p>
+<h2><a class="header" href="#1deadlocks" id="1deadlocks">1.Deadlocks</a></h2>
+<p>The original actor model is very simple. If you want to have a request-response type message, you had to send your own address along with the message so the recipient knows how to respond to you. Thanks to rust's futures, we can easily create a request-response and thespis makes this convenient for you with <code>Address::call</code>. However, if you await a response whilst processing a message, a deadlock can arise.</p>
+<p>As actors only process one message at a time, if you have a cyclic dependency, your program can deadlock. That is if have actor A depending on actor B to to process it's message, but in order to process A's request B also needs to call back A, both actors will deadlock, as they are waiting on each other and will no longer process any messages ever after.</p>
+<p>You can run into this problem through intermediate actors, so A and B might not be calling each other directly.</p>
+<p>You can also run into this problem with a single actor when using bounded channels. If the mailbox of the actor is currently full and it sends itself a message, it will deadlock. You should generally spawn such a send to avoid blocking processing of the current message.</p>
+<h2><a class="header" href="#2-memory-consumption" id="2-memory-consumption">2. Memory consumption</a></h2>
+<p>The actor model has highly concurrent message passing. If many messages are in flight, they will all consume memory. The most obvious risk is having unbounded channels to communicate between address and mailbox. If there is no back pressure, the unbounded channel can use unbounded amounts of memory.</p>
+<p>But even with bounded channels you want to keep an eye on memory consumption. If you spawn large volumes of actors, you probably want to use a channel that doesn't allocate it's full capacity. Channels based on linked lists rather than array buffers could potentially reduce a lot of memory consumption.</p>
+<h2><a class="header" href="#3-performance" id="3-performance">3. Performance</a></h2>
+<p>The main downside of the actor model is a performance overhead compared to lower level approaches. Message passing has some price and depending on your application it might be a poor fit. If you have hotspots in your code, and you need to do a lot of small operations, like calling getters on other objects, the overhead of message passing might be undesirable.</p>
+<p>Remember that the purpose of this model is to have an actor for everything that you want to run concurrently. However, you can have a module for which an actor is the facade to the outside world, but internally uses a synchronous logic. You do however want to reach a critical threshold of actors. If you have CPU cores x 4 components that run concurrently and that normally are rarely blocked, eg. most of them will be able to make progress most of the time, adding more concurrency to your program might not be the most useful for performance.</p>
+<p>That being said, you shouldn't worry about it to much. Rust is a very fast language. Even with the overhead of message passing, it will be much faster than most other languages, and remember how much useful software has been written in those languages. In 99% of the time performance shouldn't be an issue.</p>
+<p>As always, first write your software with clean design, then benchmark to see if there is a problem. If there is, profile to see what's your bottleneck.</p>
+<h2><a class="header" href="#4-blocking" id="4-blocking">4. Blocking</a></h2>
+<p>We all know that async code shouldn't block. That is we shouldn't block the thread with either to much CPU intensive work, or by waiting on things like locks. That's because other tasks might also be working on the same thread.</p>
+<p>However it's important to also think about blocking the task, even if you aren't blocking the thread. An actor that <code>call</code>s another actor will not continue processing messages until that other actor sends back a response. Given that that actor might have a backlog of messages in it's queue, and it might itself wait for other actors whilst processing those, things could severely slow down. In practice this is not a problem if you have enough actors that can make progress at any given time. You will always have a maximal usage of the system's resources, but...</p>
+<p>If you have a specific bottleneck, one or two actors that are crucial in your program that can not keep up with the rest, they become the slowest link in the chain.</p>
+<p>Certain actors should spawn sub tasks rather than blocking on them. Eg. an actor that processes incoming requests from the network. If the back-end processing of those messages is async, this actor should probably continue to process other messages while the back-end generates a response. Again, it depends on the situation. If you count serving many connections concurrently and have one actor per connection, maybe it's fine for that actor to do but one thing at a time.</p>
+<p>Note that <code>send</code> also blocks the task, but only until the message has been delivered into the mailbox of the receiving actor. It doesn't wait until the message is processed, but will block if the mailbox is full.</p>
+<h2><a class="header" href="#5-backpressure" id="5-backpressure">5. Backpressure</a></h2>
+<h2><a class="header" href="#6-actor-lifetime" id="6-actor-lifetime">6. Actor Lifetime</a></h2>
+<p>Thespis follows a model very similar to the Rust memory model. The mailbox for an actor will stop running when all addresses to this actor have been dropped and all messages have been processed. This is neat, but it does oblige you to be very conscious about where addresses are lingering, or your program won't terminate, or you might have a memory leak.</p>
+<p>The initial ambition was to say an address is always valid, and thus sending can conveniently be infallible. In practice this doesn't work, since an actor might panic while processing a message. When using remote actors, the network or the remote process might go down and on top of that, most channel implementations have a fallible send.</p>
+<p>I kept this lifetime management, because usually having addresses around to actors that are no longer running is a sign of sloppy coding. But it requires extra discipline and especially be aware of actors that have their own address, or 2 actors that have addresses to each other.</p>
+<p>One way to sidestep this is to pull the plug. That is if you cancel the future running the mailbox, well it's terminated, however this is not recommended. If you really want an actor to stop it's own mailbox, regardless of other components that might still want to use it, you can let it spawn itself so it can have a JoinHandle that it can use to abort the mailbox.</p>
+<h1><a class="header" href="#thespis_impl" id="thespis_impl">thespis_impl</a></h1>
+<p>This is the reference implementation. This chapter goes over it's features and provides you with example code. The most basic example, hello world:</p>
+<pre><pre class="playground"><code class="language-rust">use
+{
+	thespis         :: { *            } ,
+	thespis_impl    :: { *            } ,
+	async_executors :: { AsyncStd     } ,
+	std             :: { error::Error } ,
+};
+
+
+#[ derive( Actor ) ]
+//
+struct MyActor;
+
+
+struct Hello( String );
+
+impl Message for Hello
+{
+	type Return = String;
+}
+
+
+impl Handler&lt; Hello &gt; for MyActor
+{
+	#[async_fn]	fn handle( &amp;mut self, _msg: Hello ) -&gt; String
+	{
+		&quot;world&quot;.into()
+	}
+}
+
+
+#[async_std::main]
+//
+async fn main() -&gt; Result&lt; (), Box&lt;dyn Error&gt; &gt;
+{
+	let mut addr = Addr::builder().start( MyActor, &amp;AsyncStd )?;
+
+	let result = addr.call( Hello( &quot;hello&quot;.into() ) ).await?;
+
+	assert_eq!( &quot;world&quot;, result );
+
+	Ok(())
+}
+</code></pre></pre>
+<h2><a class="header" href="#discussion" id="discussion">Discussion</a></h2>
+<p>Let's quickly take a tour of the anatomy of this simple program:</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[ derive( Actor ) ]
+//
+struct MyActor;
+<span class="boring">}
+</span></code></pre></pre>
+<p><code>Actor</code> is a trait defined in the <em>thespis</em> crate. It has no required methods, so you can easily derive it. <code>MyActor</code> here is what generally holds the (mutable) state of your actor. In this simple example there is no state. The mailbox will take ownership of this and after that you can only communicate with it by sending messages through the address you get back. Once you give it to the mailbox you can no longer call methods on it.</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>struct Hello( String );
+
+impl Message for Hello
+{
+	type Return = String;
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p><code>Hello</code> is a message type. The type system will guarantee that you can never send a message type to an actor unless it implements <code>Handler</code> for that type and the type implements the <code>Message</code> trait. As you will have to implement this trait for your message types, you will have to wrap types that are not defined in your crate in order to use them as a message. Here we wrap <code>String</code>.</p>
+<p>The associated type is the return type of the handler. When using <code>Addr::call</code> your actor can return a value to the caller, making it easy to implement request-response type communication, mimicking a method call. Sending a message to an actor is always asynchronous.</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>impl Handler&lt; Hello &gt; for MyActor
+{
+	#[async_fn]	fn handle( &amp;mut self, _msg: Hello ) -&gt; String
+	{
+		&quot;world&quot;.into()
+	}
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p>Here we define that <code>MyActor</code> can process messages of type <code>Hello</code>. The body of the function does the actual processing. As you can see it receives a <code>&amp;mut self</code>, even though we know that all messages are sent asynchronously. This is the main advantage of the actor model. Even though any place in your code that has this actor's address can easily send messages, you never need thread sync like locks on your data. Only this actor can access it's own state directly and the only way to communicate with it is through sending messages. Further more the mailbox will make the actor process one message at a time, so there is never shared mutual access the the state.</p>
+<p>Using plain Object Oriented Programming in async Rust with methods that access state is very difficult, since as soon as you spawn any task, that task cannot hold any references to anything outside of it and to make matters worse, you can never hold a mutex across an await point.</p>
+<p>The <code>async_fn</code> macro deals with the fact that Rust doesn't support async trait methods at the moment. It does this in a very similar way as the <em>async-trait</em> crate, but it outputs much simpler code, making it compatible with a hand written version of this method, which was not possible with <em>async-trait</em>.</p>
+<p>A handwritten version would look like:</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>impl Handler&lt; Hello &gt; for MyActor
+{
+	fn handle( &amp;mut self, _msg: Hello ) -&gt; Return&lt;'_, String&gt;
+	{
+		Box::pin( async
+		{
+			&quot;world&quot;.into()
+		})
+	}
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p>Where <code>Return</code> is defined as:</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>/// A boxed future that is `Send`, shorthand for async trait method return types.
+//
+pub type Return&lt;'a, R&gt; = Pin&lt;Box&lt; dyn Future&lt;Output = R&gt; + 'a + Send &gt;&gt;;
+<span class="boring">}
+</span></code></pre></pre>
+<p>Note that within this handler you can <code>await</code> as it is asynchronous, but that while it is waiting, this actor will not process any more messages.</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let mut addr = Addr::builder().start( MyActor, &amp;AsyncStd )?;
+<span class="boring">}
+</span></code></pre></pre>
+<p>We use a convenience builder to create the address we will use to send messages to our actor, and tell it to
+generate a default mailbox for it and spawn it on the provided executor.</p>
+<p>The <code>AsyncStd</code> type comes from the <em>async_executor</em> crate which provides a uniform interface for executors,
+allowing us to be executor agnostic. We could just as well have given it a <code>tokio</code> executor or one from the <code>futures</code> crate.</p>
+<p>Note that this function takes our actor by value as we shouldn't access it anymore directly once it starts processing messages.</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let result = addr.call( Ping( &quot;hello&quot;.into() ) ).await?;
+<span class="boring">}
+</span></code></pre></pre>
+<p>We use <code>Address::call</code> to send a message to our actor. This method will return to us a future that will resolve to the answer our handler returns. Note that <code>Addr</code> also implements <code>futures_sink::Sink</code>. The <code>send</code> method from the <code>Sink</code> trait will drop the returned value and will return to us as soon as the message is delivered to the mailbox, without waiting for the actor to process the message.</p>
+<p>Thus you can also use the <code>call</code> method even if you don't want to return any value to be sure that the message has been processed, where as <code>send</code> is more like throwing a message in a bottle. You will still get back pressure from <code>send</code> as it will block when the channel between the <code>Addr</code> and the mailbox is full.</p>
+<p>In the next chapter we will take a look at desugaring the builder and manually create our mailbox and address.</p>
+<h1><a class="header" href="#desugar-addrbuilder" id="desugar-addrbuilder">Desugar Addr::builder()</a></h1>
+<p>Even if you will mostly be using the convenience builder to start your actors, its good to have an understanding of how things work at a lower level. So what would things look like if we wanted to manually create an actor? We will keep the simple example from the last chapter but desugar it. We already showed the desugaring of the <code>async_fn</code> macro. Here we show a full working example in which the main function is as desugared as we can get. Just know that there are intermediate steps on the builder API if you only want to override certain parameters.</p>
+<pre><pre class="playground"><code class="language-rust">use
+{
+	thespis         :: { *                         } ,
+	thespis_impl    :: { *                         } ,
+	async_executors :: { AsyncStd, SpawnHandleExt  } ,
+	std             :: { error::Error              } ,
+	futures         :: { channel::mpsc             } ,
+};
+
+
+#[ derive( Actor ) ]
+//
+struct MyActor;
+
+
+struct Hello( String );
+
+impl Message for Hello
+{
+	type Return = String;
+}
+
+
+impl Handler&lt; Hello &gt; for MyActor
+{
+	#[async_fn]	fn handle( &amp;mut self, _msg: Hello ) -&gt; String
+	{
+		&quot;world&quot;.into()
+	}
+}
+
+
+#[async_std::main]
+//
+async fn main() -&gt; Result&lt; (), Box&lt;dyn Error&gt; &gt;
+{
+	let (tx, rx)  = mpsc::channel( 5 );
+	let tx        = Box::new( tx.sink_map_err( |e| Box::new(e) as SinkError ) );
+	let mb        = Mailbox::new( Some(&quot;HelloWorld&quot;.into()), Box::new(rx) );
+	let mut addr  = Addr::new( mb.id(), mb.name(), tx );
+	let actor     = MyActor;
+
+	let handle = AsyncStd.spawn_handle( mb.start( actor ) )?;
+
+	let result = addr.call( Hello( &quot;hello&quot;.into() ) ).await?;
+
+	assert_eq!( &quot;world&quot;, dbg!(result) );
+
+	drop( addr );
+	handle.await;
+
+	Ok(())
+}
+</code></pre></pre>
+<h2><a class="header" href="#channels" id="channels">Channels</a></h2>
+<p>In thespis you can choose what channel will be used for communication between the address and the mailbox. Out of the box the builder supports both tokio and futures channels, in bounded and unbounded forms. But you might want to try a different channel type. One interesting application is if you want to use a channel that overwrites older messages instead of providing back pressure, like the one in the <em>ring-channel</em> crate.</p>
+<p>The abstractions the thespis types work on are defined as:</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span>
+<span class="boring">fn main() {
+</span>/// Interface for T: Sink + Clone
+//
+pub trait CloneSink&lt;'a, Item, E&gt;: Sink&lt;Item, Error=E&gt; + Unpin + Send
+{
+	/// Clone this sink.
+	//
+	fn clone_sink( &amp;self ) -&gt; Box&lt; dyn CloneSink&lt;'a, Item, E&gt; + 'a &gt;;
+}
+
+
+impl&lt;'a, T, Item, E&gt; CloneSink&lt;'a, Item, E&gt; for T
+
+	where T: 'a + Sink&lt;Item, Error=E&gt; + Clone + Unpin + Send + ?Sized
+
+{
+	fn clone_sink( &amp;self ) -&gt; Box&lt; dyn CloneSink&lt;'a, Item, E&gt; + 'a &gt;
+	{
+		Box::new( self.clone() )
+	}
+}
+
+
+/// A boxed error type for the sink
+//
+pub type SinkError = Box&lt; dyn std::error::Error + Send + 'static &gt;;
+
+/// Type of boxed channel sender for Addr.
+//
+pub type ChanSender&lt;A&gt; = Box&lt; dyn CloneSink&lt; 'static, BoxEnvelope&lt;A&gt;, SinkError&gt; &gt;;
+
+/// Type of boxed channel receiver for Mailbox.
+//
+pub type ChanReceiver&lt;A&gt; = Box&lt; dyn futures::Stream&lt;Item=BoxEnvelope&lt;A&gt;&gt; + Send + Unpin &gt;;
+<span class="boring">}
+</span></code></pre></pre>
+<p>Thus the sender must implement <code>Sink</code>, <code>Clone</code>, <code>Unpin</code> and <code>Send</code> and it's error type must be <code>Box&lt; dyn std::error::Error + Send + 'static &gt;</code>. The receiver must be infallible and implement <code>Stream</code>, <code>Send</code> and <code>Unpin</code>. If your favorite channel implementation does not provide the <code>Sink</code> interface on it's sender, check out the <code>async_chanx</code> crate which provides some <code>Sink</code> implementations for you.</p>
+<h2><a class="header" href="#mailbox-and-addr" id="mailbox-and-addr">Mailbox and Addr</a></h2>
+<p>Next we create our mailbox and address:</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let mb       = Mailbox::new( Some(&quot;HelloWorld&quot;.into()), Box::new(rx) );
+let mut addr = Addr::new( mb.id(), mb.name(), tx );
+<span class="boring">}
+</span></code></pre></pre>
+<p>You can see that the constructors take a few parameters. The first parameter on <code>Mailbox::new</code> is an optional name. This will be used in logging to help you identify which actor is doing what. The id in the second line is similar but is just a numeric counter. Every mailbox created in the process will have a unique numeric id, but you can also name them to make it easier to understand your logs.</p>
+<p>We feed both ends to the constructors of <code>Mailbox</code> and <code>Addr</code>. You may notice that we just created both the mailbox and the address without even having instantiated an actor yet. That is because we only really need an actor when we start the mailbox. This has an interesting property. If we want our actor to have a copy of it's own address, we can just pass it along in it's constructor, since as soon as we start it we can only communicate to it through messages. It would be a bit of a pain to have to create a specific message type to give the actor it's own address.</p>
+<h2><a class="header" href="#starting-the-mailbox" id="starting-the-mailbox">Starting the mailbox</a></h2>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let actor  = MyActor;
+let handle = AsyncStd.spawn_handle( mb.start( actor ) )?;
+<span class="boring">}
+</span></code></pre></pre>
+<p>Next we create an actor and pass it to <code>Mailbox::start</code>. This method returns a future that you can spawn however way you like on the executor of your choice. <code>Mailbox</code> has a a few convenience methods as well which allow you to pass the executor by reference which avoids having to import the spawn traits as well as local versions for spawning actors that aren't <code>Send</code>. Check the API docs.</p>
+<p>We use the <code>AsyncStd</code> wrapper from async_executors here. One essential difference with using <code>async-std</code> directly is that the joinhandle this returns will cancel the future when you drop it, which is a way you can stop an actor. The recommended way is to drop all addresses to the actor.</p>
+<h2><a class="header" href="#stopping-the-actor" id="stopping-the-actor">Stopping the actor</a></h2>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>drop( addr );
+handle.await;
+<span class="boring">}
+</span></code></pre></pre>
+<p>As described above, to drop an actor we drop all addresses to it. Now we can await the mailbox which will terminate.</p>
+<h1><a class="header" href="#introduction-to-thespis_remote" id="introduction-to-thespis_remote">Introduction to thespis_remote.</a></h1>
+<p><em>Thespis_remote</em> adds support for remote actors to the thespis actor model. It follows the same rather low level approach as the rest of <em>thespis</em>. That means it provides the ability to send actor messages over one connection. The connection <em>thespis_remote</em> works over is a <code>Sink</code> and <code>Stream</code> of a given wire format. This with an encoder/decoder it works over anything that implements <code>AsyncRead</code>/<code>AsyncWrite</code>.</p>
+<p>There is no &quot;system&quot; or discovery integrated. It requires you to connect two processes by any means of your choice and provide the above interfaces to <em>thespis_remote</em>. From there <em>thespis_remote</em> provides:</p>
+<ul>
+<li><code>RemoteAddr</code> which allows you to send messages as if you were sending to an actor in the same process.</li>
+<li><code>ServiceMap</code>, a trait and provided reference impl that knows how to deserialize your actor messages and dispatch them to the right actor. Note that you can only set one actor per message type per service map, so you are actually sending to a remote process rather than to an individual actor in that process. However you can easily wrap your message with an actor id and provide more precise delivery if you want.</li>
+<li><code>WireFormat</code>, a trait and reference impl for the actual wire format used.</li>
+<li><code>Peer</code>, an actor that manages a connection endpoint. You provide it with a service map to &quot;serve&quot; over the connection and you pass it when you create <code>RemoteAddr</code> stating that you know that the other side of the connection managed by this <code>Peer</code> exposes the services you</li>
+</ul>
+<p>These are the four core components of the library.</p>
+<p><em>thespis_remote</em> also provides relaying of messages. Further some features are included to deal with back pressure and to make it resistant to attacks like DOS and slow loris.</p>
+<p>Apart from this guide you can also consult the <a href="https://docs.rs/thespis_remote">API documentation</a> and the <a href="https://github.com/thespis-rs/thespis_remote/tree/master/examples">examples</a>.</p>
+<h1><a class="header" href="#design" id="design">Design</a></h1>
+<p>You might feel cheated that you can't address individual actors on a remote process. There are good reasons for this however and nothing stops you from implementing this functionality on top of <em>thespis_remote</em>. In <em>thespis</em> everything is as much as possible statically type checked. By considering a process that exposes it's possibility to receive messages of certain types, we adhere to a public interface like a contract. It allows a remote process to statically create addresses to send us messages, rather than having to send over addresses at runtime.</p>
+<p>Actors can accept several types of messages, but some of those might not be meant for external use. If we were to expose an address to this actor as is, all of it's interface would be remotely exposed. We would also need to compile in the actor type in the remote process, where with the current design only message types need to be shared between the two processes.</p>
+<p><em>thespis_remote</em> is minimal in the sense that it creates the fundamental building block for remote actor communication. Systems, discovery and individual actor addressing can all be implemented on top of it.</p>
+<p>Several components of the library can easily be customized. The traits <code>WireFormat</code> and <code>ServiceMap</code> allow you to create your own specialized implementations if desired.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+
+                
+            </nav>
+
+        </div>
+
+        
+        <!-- Livereload script (if served using the cli tool) -->
+        <script type="text/javascript">
+            var socket = new WebSocket("ws://localhost:3000/__livereload");
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
+        
+
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+        
+        <script type="text/javascript">
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+        
+        
+
+    </body>
+</html>

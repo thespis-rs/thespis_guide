@@ -1,0 +1,374 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Desugar Addr::builder() - Thespis User Guide</title>
+        
+        
+
+
+        <!-- Custom HTML head -->
+        
+
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        
+        <link rel="icon" href="../favicon.svg">
+        
+        
+        <link rel="shortcut icon" href="../favicon.png">
+        
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        
+        <link rel="stylesheet" href="../fonts/fonts.css">
+        
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../actor_model.html"><strong aria-hidden="true">2.</strong> What is the actor model?</a></li><li class="chapter-item expanded "><a href="../what_is_thespis.html"><strong aria-hidden="true">3.</strong> What is thespis?</a></li><li class="chapter-item expanded "><a href="../pitfalls.html"><strong aria-hidden="true">4.</strong> Pitfalls Checklist</a></li><li class="chapter-item expanded "><a href="../thespis_impl/thespis_impl.html"><strong aria-hidden="true">5.</strong> thespis_impl</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../thespis_impl/desugar.html" class="active"><strong aria-hidden="true">5.1.</strong> Desugar Addr::builder()</a></li></ol></li><li class="chapter-item expanded "><a href="../thespis_remote/introduction.html"><strong aria-hidden="true">6.</strong> thespis_remote</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">Thespis User Guide</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#desugar-addrbuilder" id="desugar-addrbuilder">Desugar Addr::builder()</a></h1>
+<p>Even if you will mostly be using the convenience builder to start your actors, its good to have an understanding of how things work at a lower level. So what would things look like if we wanted to manually create an actor? We will keep the simple example from the last chapter but desugar it. We already showed the desugaring of the <code>async_fn</code> macro. Here we show a full working example in which the main function is as desugared as we can get. Just know that there are intermediate steps on the builder API if you only want to override certain parameters.</p>
+<pre><pre class="playground"><code class="language-rust">use
+{
+	thespis         :: { *                         } ,
+	thespis_impl    :: { *                         } ,
+	async_executors :: { AsyncStd, SpawnHandleExt  } ,
+	std             :: { error::Error              } ,
+	futures         :: { channel::mpsc             } ,
+};
+
+
+#[ derive( Actor ) ]
+//
+struct MyActor;
+
+
+struct Hello( String );
+
+impl Message for Hello
+{
+	type Return = String;
+}
+
+
+impl Handler&lt; Hello &gt; for MyActor
+{
+	#[async_fn]	fn handle( &amp;mut self, _msg: Hello ) -&gt; String
+	{
+		&quot;world&quot;.into()
+	}
+}
+
+
+#[async_std::main]
+//
+async fn main() -&gt; Result&lt; (), Box&lt;dyn Error&gt; &gt;
+{
+	let (tx, rx)  = mpsc::channel( 5 );
+	let tx        = Box::new( tx.sink_map_err( |e| Box::new(e) as SinkError ) );
+	let mb        = Mailbox::new( Some(&quot;HelloWorld&quot;.into()), Box::new(rx) );
+	let mut addr  = Addr::new( mb.id(), mb.name(), tx );
+	let actor     = MyActor;
+
+	let handle = AsyncStd.spawn_handle( mb.start( actor ) )?;
+
+	let result = addr.call( Hello( &quot;hello&quot;.into() ) ).await?;
+
+	assert_eq!( &quot;world&quot;, dbg!(result) );
+
+	drop( addr );
+	handle.await;
+
+	Ok(())
+}
+</code></pre></pre>
+<h2><a class="header" href="#channels" id="channels">Channels</a></h2>
+<p>In thespis you can choose what channel will be used for communication between the address and the mailbox. Out of the box the builder supports both tokio and futures channels, in bounded and unbounded forms. But you might want to try a different channel type. One interesting application is if you want to use a channel that overwrites older messages instead of providing back pressure, like the one in the <em>ring-channel</em> crate.</p>
+<p>The abstractions the thespis types work on are defined as:</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span>
+<span class="boring">fn main() {
+</span>/// Interface for T: Sink + Clone
+//
+pub trait CloneSink&lt;'a, Item, E&gt;: Sink&lt;Item, Error=E&gt; + Unpin + Send
+{
+	/// Clone this sink.
+	//
+	fn clone_sink( &amp;self ) -&gt; Box&lt; dyn CloneSink&lt;'a, Item, E&gt; + 'a &gt;;
+}
+
+
+impl&lt;'a, T, Item, E&gt; CloneSink&lt;'a, Item, E&gt; for T
+
+	where T: 'a + Sink&lt;Item, Error=E&gt; + Clone + Unpin + Send + ?Sized
+
+{
+	fn clone_sink( &amp;self ) -&gt; Box&lt; dyn CloneSink&lt;'a, Item, E&gt; + 'a &gt;
+	{
+		Box::new( self.clone() )
+	}
+}
+
+
+/// A boxed error type for the sink
+//
+pub type SinkError = Box&lt; dyn std::error::Error + Send + 'static &gt;;
+
+/// Type of boxed channel sender for Addr.
+//
+pub type ChanSender&lt;A&gt; = Box&lt; dyn CloneSink&lt; 'static, BoxEnvelope&lt;A&gt;, SinkError&gt; &gt;;
+
+/// Type of boxed channel receiver for Mailbox.
+//
+pub type ChanReceiver&lt;A&gt; = Box&lt; dyn futures::Stream&lt;Item=BoxEnvelope&lt;A&gt;&gt; + Send + Unpin &gt;;
+<span class="boring">}
+</span></code></pre></pre>
+<p>Thus the sender must implement <code>Sink</code>, <code>Clone</code>, <code>Unpin</code> and <code>Send</code> and it's error type must be <code>Box&lt; dyn std::error::Error + Send + 'static &gt;</code>. The receiver must be infallible and implement <code>Stream</code>, <code>Send</code> and <code>Unpin</code>. If your favorite channel implementation does not provide the <code>Sink</code> interface on it's sender, check out the <code>async_chanx</code> crate which provides some <code>Sink</code> implementations for you.</p>
+<h2><a class="header" href="#mailbox-and-addr" id="mailbox-and-addr">Mailbox and Addr</a></h2>
+<p>Next we create our mailbox and address:</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let mb       = Mailbox::new( Some(&quot;HelloWorld&quot;.into()), Box::new(rx) );
+let mut addr = Addr::new( mb.id(), mb.name(), tx );
+<span class="boring">}
+</span></code></pre></pre>
+<p>You can see that the constructors take a few parameters. The first parameter on <code>Mailbox::new</code> is an optional name. This will be used in logging to help you identify which actor is doing what. The id in the second line is similar but is just a numeric counter. Every mailbox created in the process will have a unique numeric id, but you can also name them to make it easier to understand your logs.</p>
+<p>We feed both ends to the constructors of <code>Mailbox</code> and <code>Addr</code>. You may notice that we just created both the mailbox and the address without even having instantiated an actor yet. That is because we only really need an actor when we start the mailbox. This has an interesting property. If we want our actor to have a copy of it's own address, we can just pass it along in it's constructor, since as soon as we start it we can only communicate to it through messages. It would be a bit of a pain to have to create a specific message type to give the actor it's own address.</p>
+<h2><a class="header" href="#starting-the-mailbox" id="starting-the-mailbox">Starting the mailbox</a></h2>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let actor  = MyActor;
+let handle = AsyncStd.spawn_handle( mb.start( actor ) )?;
+<span class="boring">}
+</span></code></pre></pre>
+<p>Next we create an actor and pass it to <code>Mailbox::start</code>. This method returns a future that you can spawn however way you like on the executor of your choice. <code>Mailbox</code> has a a few convenience methods as well which allow you to pass the executor by reference which avoids having to import the spawn traits as well as local versions for spawning actors that aren't <code>Send</code>. Check the API docs.</p>
+<p>We use the <code>AsyncStd</code> wrapper from async_executors here. One essential difference with using <code>async-std</code> directly is that the joinhandle this returns will cancel the future when you drop it, which is a way you can stop an actor. The recommended way is to drop all addresses to the actor.</p>
+<h2><a class="header" href="#stopping-the-actor" id="stopping-the-actor">Stopping the actor</a></h2>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>drop( addr );
+handle.await;
+<span class="boring">}
+</span></code></pre></pre>
+<p>As described above, to drop an actor we drop all addresses to it. Now we can await the mailbox which will terminate.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="../thespis_impl/thespis_impl.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="../thespis_remote/introduction.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a rel="prev" href="../thespis_impl/thespis_impl.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a rel="next" href="../thespis_remote/introduction.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+        <!-- Livereload script (if served using the cli tool) -->
+        <script type="text/javascript">
+            var socket = new WebSocket("ws://localhost:3000/__livereload");
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
+        
+
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>
