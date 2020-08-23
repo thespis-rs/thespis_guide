@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>thespis_remote - Thespis User Guide</title>
+        <title>What is the actor model? - Thespis User Guide</title>
         
         
 
@@ -18,26 +18,26 @@
         <meta name="theme-color" content="#ffffff" />
 
         
-        <link rel="icon" href="../favicon.svg">
+        <link rel="icon" href="favicon.svg">
         
         
-        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="shortcut icon" href="favicon.png">
         
-        <link rel="stylesheet" href="../css/variables.css">
-        <link rel="stylesheet" href="../css/general.css">
-        <link rel="stylesheet" href="../css/chrome.css">
-        <link rel="stylesheet" href="../css/print.css" media="print">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
 
         <!-- Fonts -->
-        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
         
-        <link rel="stylesheet" href="../fonts/fonts.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
         
 
         <!-- Highlight.js Stylesheets -->
-        <link rel="stylesheet" href="../highlight.css">
-        <link rel="stylesheet" href="../tomorrow-night.css">
-        <link rel="stylesheet" href="../ayu-highlight.css">
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
         
@@ -47,7 +47,7 @@
     <body>
         <!-- Provide site root to javascript -->
         <script type="text/javascript">
-            var path_to_root = "../";
+            var path_to_root = "";
             var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
         </script>
 
@@ -93,7 +93,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../actor_model.html"><strong aria-hidden="true">2.</strong> What is the actor model?</a></li><li class="chapter-item expanded "><a href="../what_is_thespis.html"><strong aria-hidden="true">3.</strong> What is thespis?</a></li><li class="chapter-item expanded "><a href="../pitfalls.html"><strong aria-hidden="true">4.</strong> Pitfalls Checklist</a></li><li class="chapter-item expanded "><a href="../thespis_impl/thespis_impl.html"><strong aria-hidden="true">5.</strong> thespis_impl</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../thespis_impl/desugar.html"><strong aria-hidden="true">5.1.</strong> Desugar Addr::builder()</a></li></ol></li><li class="chapter-item expanded "><a href="../thespis_remote/introduction.html" class="active"><strong aria-hidden="true">6.</strong> thespis_remote</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="actor_model.html" class="active"><strong aria-hidden="true">2.</strong> What is the actor model?</a></li><li class="chapter-item expanded "><a href="what_is_thespis.html"><strong aria-hidden="true">3.</strong> What is thespis?</a></li><li class="chapter-item expanded "><a href="pitfalls.html"><strong aria-hidden="true">4.</strong> Pitfalls Checklist</a></li><li class="chapter-item expanded "><a href="thespis_impl/thespis_impl.html"><strong aria-hidden="true">5.</strong> thespis_impl</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="thespis_impl/desugar.html"><strong aria-hidden="true">5.1.</strong> Desugar Addr::builder()</a></li></ol></li><li class="chapter-item expanded "><a href="thespis_remote/introduction.html"><strong aria-hidden="true">6.</strong> thespis_remote</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -128,7 +128,7 @@
                     <h1 class="menu-title">Thespis User Guide</h1>
 
                     <div class="right-buttons">
-                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
                         </a>
                         
@@ -159,34 +159,32 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#introduction-to-thespis_remote" id="introduction-to-thespis_remote">Introduction to thespis_remote.</a></h1>
-<p><em>Thespis_remote</em> adds support for remote actors to the thespis actor model. It follows the same rather low level approach as the rest of <em>thespis</em>. That means it provides the ability to send actor messages over one connection. The connection <em>thespis_remote</em> works over is a <code>Sink</code> and <code>Stream</code> of a given wire format. This with an encoder/decoder it works over anything that implements <code>AsyncRead</code>/<code>AsyncWrite</code>.</p>
-<p>There is no &quot;system&quot; or discovery integrated. It requires you to connect two processes by any means of your choice and provide the above interfaces to <em>thespis_remote</em>. From there <em>thespis_remote</em> provides:</p>
+                        <h1><a class="header" href="#what-is-the-actor-model" id="what-is-the-actor-model">What is the actor model?</a></h1>
+<p>The actor model is a program design model tailored to asynchronous concurrent processing. It was first conceived in 1973 by Carl Hewitt.  <a href="https://en.wikipedia.org/wiki/Actor_model">Wikipedia</a> has a thorough introduction.</p>
+<p>To simplify, the actor model is an object oriented model which encapsulates not only data but also behavior. That is an actor is an object which can hold local mutable state, but other actors cannot access the state, neither call methods on the actor. The only way to interact with it is by sending it a message.</p>
+<p>This is the key advantage of the actor model. Since no direct method calls take place, there is no shared memory access. There is no need for locking as only the actor itself will be able to access it's state. The actor processes one message at a time. Thus during message processing it is always guaranteed to be the only piece of the program accessing it's state and no synchronization is needed.</p>
+<p>You might have found out that people struggle to use the OOP model in Rust. Rust doesn't allow you to cheat when it comes to memory access. The compiler is very strict and it turns out its hard to write traditional OOP with a strict compiler. When you add concurrency and multi-threading to the mix it becomes downright impractical. The actor model solves exactly this problem as memory synchronization is simple eliminated from the equation.</p>
+<p>For the rest of this book, it is assumed that you have some basic understanding of how the actor model works. If this is new for you, please check the following resources:</p>
 <ul>
-<li><code>RemoteAddr</code> which allows you to send messages as if you were sending to an actor in the same process.</li>
-<li><code>ServiceMap</code>, a trait and provided reference impl that knows how to deserialize your actor messages and dispatch them to the right actor. Note that you can only set one actor per message type per service map, so you are actually sending to a remote process rather than to an individual actor in that process. However you can easily wrap your message with an actor id and provide more precise delivery if you want.</li>
-<li><code>WireFormat</code>, a trait and reference impl for the actual wire format used.</li>
-<li><code>Peer</code>, an actor that manages a connection endpoint. You provide it with a service map to &quot;serve&quot; over the connection and you pass it when you create <code>RemoteAddr</code> stating that you know that the other side of the connection managed by this <code>Peer</code> exposes the services you</li>
+<li><a href="https://en.wikipedia.org/wiki/Actor_model">Wikipedia</a></li>
+<li><a href="https://www.youtube.com/watch?v=7erJ1DV_Tlo">Everything you ever wanted to know about the actor model by Carl Hewitt</a> (video, highly recommended)</li>
 </ul>
-<p>These are the four core components of the library.</p>
-<p><em>thespis_remote</em> also provides relaying of messages. Further some features are included to deal with back pressure and to make it resistant to attacks like DOS and slow loris.</p>
-<p>Apart from this guide you can also consult the <a href="https://docs.rs/thespis_remote">API documentation</a> and the <a href="https://github.com/thespis-rs/thespis_remote/tree/master/examples">examples</a>.</p>
-<h1><a class="header" href="#design" id="design">Design</a></h1>
-<p>You might feel cheated that you can't address individual actors on a remote process. There are good reasons for this however and nothing stops you from implementing this functionality on top of <em>thespis_remote</em>. In <em>thespis</em> everything is as much as possible statically type checked. By considering a process that exposes it's possibility to receive messages of certain types, we adhere to a public interface like a contract. It allows a remote process to statically create addresses to send us messages, rather than having to send over addresses at runtime.</p>
-<p>Actors can accept several types of messages, but some of those might not be meant for external use. If we were to expose an address to this actor as is, all of it's interface would be remotely exposed. We would also need to compile in the actor type in the remote process, where with the current design only message types need to be shared between the two processes.</p>
-<p><em>thespis_remote</em> is minimal in the sense that it creates the fundamental building block for remote actor communication. Systems, discovery and individual actor addressing can all be implemented on top of it.</p>
-<p>Several components of the library can easily be customized. The traits <code>WireFormat</code> and <code>ServiceMap</code> allow you to create your own specialized implementations if desired.</p>
+<p>The Thespis API is inpired by <a href="https://docs.rs/actix/">actix</a>. If you are already familiar with actix, it will be easy to pick up thespis.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                         
-                            <a rel="prev" href="../thespis_impl/desugar.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="introduction.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
                         
 
+                        
+                            <a rel="next" href="what_is_thespis.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
                         
 
                         <div style="clear: both"></div>
@@ -196,31 +194,20 @@
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
-                    <a rel="prev" href="../thespis_impl/desugar.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="introduction.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 
 
                 
+                    <a rel="next" href="what_is_thespis.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
             </nav>
 
         </div>
 
-        
-        <!-- Livereload script (if served using the cli tool) -->
-        <script type="text/javascript">
-            var socket = new WebSocket("ws://localhost:3000/__livereload");
-            socket.onmessage = function (event) {
-                if (event.data === "reload") {
-                    socket.close();
-                    location.reload();
-                }
-            };
-
-            window.onbeforeunload = function() {
-                socket.close();
-            }
-        </script>
         
 
         
@@ -236,14 +223,14 @@
         
 
         
-        <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
         
 
-        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
-        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
 
         <!-- Custom JS scripts -->
         
