@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>thespis_remote - Thespis User Guide</title>
+        <title>Supervising an actor - Thespis User Guide</title>
         
         
 
@@ -95,7 +95,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../actor_model.html"><strong aria-hidden="true">2.</strong> What is the actor model?</a></li><li class="chapter-item expanded "><a href="../what_is_thespis.html"><strong aria-hidden="true">3.</strong> What is thespis?</a></li><li class="chapter-item expanded "><a href="../pitfalls.html"><strong aria-hidden="true">4.</strong> Pitfalls Checklist</a></li><li class="chapter-item expanded "><a href="../thespis_impl/thespis_impl.html"><strong aria-hidden="true">5.</strong> thespis_impl</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../thespis_impl/desugar.html"><strong aria-hidden="true">5.1.</strong> Desugar Addr::builder()</a></li><li class="chapter-item expanded "><a href="../thespis_impl/supervision.html"><strong aria-hidden="true">5.2.</strong> Supervising an actor</a></li><li class="chapter-item expanded "><a href="../thespis_impl/concurrent.html"><strong aria-hidden="true">5.3.</strong> Processing messages concurrently</a></li></ol></li><li class="chapter-item expanded "><a href="../thespis_remote/introduction.html" class="active"><strong aria-hidden="true">6.</strong> thespis_remote</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../actor_model.html"><strong aria-hidden="true">2.</strong> What is the actor model?</a></li><li class="chapter-item expanded "><a href="../what_is_thespis.html"><strong aria-hidden="true">3.</strong> What is thespis?</a></li><li class="chapter-item expanded "><a href="../pitfalls.html"><strong aria-hidden="true">4.</strong> Pitfalls Checklist</a></li><li class="chapter-item expanded "><a href="../thespis_impl/thespis_impl.html"><strong aria-hidden="true">5.</strong> thespis_impl</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../thespis_impl/desugar.html"><strong aria-hidden="true">5.1.</strong> Desugar Addr::builder()</a></li><li class="chapter-item expanded "><a href="../thespis_impl/supervision.html" class="active"><strong aria-hidden="true">5.2.</strong> Supervising an actor</a></li><li class="chapter-item expanded "><a href="../thespis_impl/concurrent.html"><strong aria-hidden="true">5.3.</strong> Processing messages concurrently</a></li></ol></li><li class="chapter-item expanded "><a href="../thespis_remote/introduction.html"><strong aria-hidden="true">6.</strong> thespis_remote</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -161,34 +161,175 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#introduction-to-thespis_remote" id="introduction-to-thespis_remote">Introduction to thespis_remote.</a></h1>
-<p><em>Thespis_remote</em> adds support for remote actors to the thespis actor model. It follows the same rather low level approach as the rest of <em>thespis</em>. That means it provides the ability to send actor messages over one connection. The connection <em>thespis_remote</em> works over is a <code>Sink</code> and <code>Stream</code> of a given wire format. This with an encoder/decoder it works over anything that implements <code>AsyncRead</code>/<code>AsyncWrite</code>.</p>
-<p>There is no &quot;system&quot; or discovery integrated. It requires you to connect two processes by any means of your choice and provide the above interfaces to <em>thespis_remote</em>. From there <em>thespis_remote</em> provides:</p>
-<ul>
-<li><code>RemoteAddr</code> which allows you to send messages as if you were sending to an actor in the same process.</li>
-<li><code>ServiceMap</code>, a trait and provided reference impl that knows how to deserialize your actor messages and dispatch them to the right actor. Note that you can only set one actor per message type per service map, so you are actually sending to a remote process rather than to an individual actor in that process. However you can easily wrap your message with an actor id and provide more precise delivery if you want.</li>
-<li><code>WireFormat</code>, a trait and reference impl for the actual wire format used.</li>
-<li><code>Peer</code>, an actor that manages a connection endpoint. You provide it with a service map to &quot;serve&quot; over the connection and you pass it when you create <code>RemoteAddr</code> stating that you know that the other side of the connection managed by this <code>Peer</code> exposes the services you</li>
-</ul>
-<p>These are the four core components of the library.</p>
-<p><em>thespis_remote</em> also provides relaying of messages. Further some features are included to deal with back pressure and to make it resistant to attacks like DOS and slow loris.</p>
-<p>Apart from this guide you can also consult the <a href="https://docs.rs/thespis_remote">API documentation</a> and the <a href="https://github.com/thespis-rs/thespis_remote/tree/master/examples">examples</a>.</p>
-<h1><a class="header" href="#design" id="design">Design</a></h1>
-<p>You might feel cheated that you can't address individual actors on a remote process. There are good reasons for this however and nothing stops you from implementing this functionality on top of <em>thespis_remote</em>. In <em>thespis</em> everything is as much as possible statically type checked. By considering a process that exposes it's possibility to receive messages of certain types, we adhere to a public interface like a contract. It allows a remote process to statically create addresses to send us messages, rather than having to send over addresses at runtime.</p>
-<p>Actors can accept several types of messages, but some of those might not be meant for external use. If we were to expose an address to this actor as is, all of it's interface would be remotely exposed. We would also need to compile in the actor type in the remote process, where with the current design only message types need to be shared between the two processes.</p>
-<p><em>thespis_remote</em> is minimal in the sense that it creates the fundamental building block for remote actor communication. Systems, discovery and individual actor addressing can all be implemented on top of it.</p>
-<p>Several components of the library can easily be customized. The traits <code>WireFormat</code> and <code>ServiceMap</code> allow you to create your own specialized implementations if desired.</p>
+                        <h1><a class="header" href="#supervising-an-actor" id="supervising-an-actor">Supervising an actor</a></h1>
+<p>A common pattern in actor software is supervision. The idea is to monitor a hierarchy of actors and if any one crashes, it's supervisor will spawn a new one to replace it. This is a strategy for more robust software. In terms of Rust actors, I would rather suggest you try to make your handlers panic free, and let them return a <code>Result</code> that you can handle if they are fallible, but that is not always possible and you can use the supervision pattern with thespis.</p>
+<p>The following example is relatively straightforward. The main feature allowing supervising in thespis is that the mailbox future returns the mailbox to you if the actor panics while processing a message. This means that you can just instantiate a new actor and spawn the mailbox again and it will be fully operational. All addresses to it will just remain valid.</p>
+<p><strong>Warning</strong>: This does mean that mailbox uses catch unwind on your handlers. That means they should be unwindsafe, but as you shouldn't be using shared mutability anyway this should already be the case.</p>
+<pre><pre class="playground"><code class="language-rust">use
+{
+   thespis           :: { *                    } ,
+   thespis_impl      :: { *                    } ,
+   tracing           :: { *                    } ,
+   futures::task     :: { Spawn, SpawnExt      } ,
+   std               :: { error::Error         } ,
+   async_executors   :: { AsyncStd, JoinHandle } ,
+};
+
+
+#[ derive( Actor ) ] struct Counter;
+
+struct Add(usize);
+
+
+impl Message for Add  { type Return = usize; }
+
+
+// This is a silly actor, if you send it an even number, it panics.
+// Otherwise it returns your number to you.
+//
+impl Handler&lt; Add &gt; for Counter
+{
+   #[async_fn] fn handle( &amp;mut self, msg: Add ) -&gt; usize
+   {
+      if msg.0 % 2 == 0 { panic!(); }
+
+      msg.0
+   }
+}
+
+
+// Actor that can supervise other actors. It will start the actor for the first time
+// if it's not already started.
+//
+#[ derive( Actor ) ]
+//
+struct Supervisor
+{
+   // We will need to spawn the mailbox again if the actor panics, so we need an executor.
+   // If you want to make this more hierarchical, you can use a nursery from the async_nursery
+   // crate to tie all these subtasks to the lifetime of the supervisor and prevent them from
+   // getting orphaned.
+   //
+   exec: Box&lt;dyn Spawn + Send&gt;
+}
+
+
+// The message we will be sending.
+//
+struct Supervise&lt;A: Actor&gt;
+{
+   mailbox : Option&lt; JoinHandle&lt;Option&lt;Mailbox&lt;A&gt;&gt;&gt; &gt; ,
+
+   // A closure that knows how to instantiate the supervised actor.
+   //
+   create: Box&lt; dyn FnMut() -&gt;A + Send &gt; ,
+}
+
+impl&lt;A: Actor + Send&gt; Message for Supervise&lt;A&gt;
+{
+   type Return = Option&lt; Addr&lt;A&gt; &gt;;
+}
+
+
+// Note how the actor type is a generic parameter, so this supervisor works for
+// actors of any type.
+//
+impl&lt;A: Actor + Send&gt; Handler&lt; Supervise&lt;A&gt; &gt; for Supervisor
+{
+   #[async_fn] fn handle( &amp;mut self, mut actor: Supervise&lt;A&gt; ) -&gt; Option&lt; Addr&lt;A&gt; &gt;
+   {
+      let mut addr = None;
+
+      let mut mb_handle = if actor.mailbox.is_none()
+      {
+         let (addr_new, mb_handle) = Addr::builder().start_handle( (actor.create)(), &amp;AsyncStd ).unwrap();
+
+         addr = Some(addr_new);
+
+         mb_handle
+      }
+
+      else { actor.mailbox.take().unwrap() };
+
+
+      let supervisor = async move
+      {
+         // This is where the magic happens. Every time the handle resolves, we spawn again
+         // and replace it with a new handle.
+         //
+         // When this returns None, it means the actor has stopped naturally and we don't respawn it.
+         //
+         while let Some(mb) = mb_handle.await
+         {
+            mb_handle = mb.start_handle( (actor.create)(), &amp;AsyncStd ).unwrap();
+         }
+      };
+
+      self.exec.spawn( supervisor ).unwrap();
+
+      addr
+   }
+}
+
+
+#[async_std::main]
+//
+async fn main() -&gt; Result&lt; (), Box&lt;dyn Error&gt; &gt;
+{
+   tracing_subscriber::fmt::Subscriber::builder()
+
+      .with_max_level( Level::DEBUG )
+      .init()
+   ;
+
+   let mut supervisor = Addr::builder().start( Supervisor{ exec: Box::new( AsyncStd ) }, &amp;AsyncStd )?;
+
+
+   // Here we use a closure to create new actors, but if you don't need to capture
+   // anything from the environment you might as well just implement `Default` for
+   // your actor type.
+   //
+   let create = Box::new( ||
+   {
+      debug!( &quot;Creating a new Counter&quot; );
+      Counter
+   });
+
+   let supervise = Supervise
+   {
+      create,
+      mailbox: None,
+   };
+
+   let mut addr = supervisor.call( supervise ).await?.unwrap();
+
+   // Both of these will make the actor panic:
+   //
+   assert!(matches!( addr.call( Add(10) ).await, Err( ThesErr::ActorStoppedBeforeResponse{..} ) ));
+   assert!(matches!( addr.send( Add(10) ).await, Ok(()) ));
+
+   // Yet, our actor is still responding.
+   //
+   assert_eq!( addr.call( Add(11) ).await, Ok(11) );
+
+   Ok(())
+}
+</code></pre></pre>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                         
-                            <a rel="prev" href="../thespis_impl/concurrent.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../thespis_impl/desugar.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
                         
 
+                        
+                            <a rel="next" href="../thespis_impl/concurrent.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
                         
 
                         <div style="clear: both"></div>
@@ -198,11 +339,15 @@
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
-                    <a rel="prev" href="../thespis_impl/concurrent.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../thespis_impl/desugar.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 
 
+                
+                    <a rel="next" href="../thespis_impl/concurrent.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
                 
             </nav>
 

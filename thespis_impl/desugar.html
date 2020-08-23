@@ -41,6 +41,8 @@
 
         <!-- Custom theme stylesheets -->
         
+        <link rel="stylesheet" href="../custom.css">
+        
 
         
     </head>
@@ -93,7 +95,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../actor_model.html"><strong aria-hidden="true">2.</strong> What is the actor model?</a></li><li class="chapter-item expanded "><a href="../what_is_thespis.html"><strong aria-hidden="true">3.</strong> What is thespis?</a></li><li class="chapter-item expanded "><a href="../pitfalls.html"><strong aria-hidden="true">4.</strong> Pitfalls Checklist</a></li><li class="chapter-item expanded "><a href="../thespis_impl/thespis_impl.html"><strong aria-hidden="true">5.</strong> thespis_impl</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../thespis_impl/desugar.html" class="active"><strong aria-hidden="true">5.1.</strong> Desugar Addr::builder()</a></li></ol></li><li class="chapter-item expanded "><a href="../thespis_remote/introduction.html"><strong aria-hidden="true">6.</strong> thespis_remote</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../actor_model.html"><strong aria-hidden="true">2.</strong> What is the actor model?</a></li><li class="chapter-item expanded "><a href="../what_is_thespis.html"><strong aria-hidden="true">3.</strong> What is thespis?</a></li><li class="chapter-item expanded "><a href="../pitfalls.html"><strong aria-hidden="true">4.</strong> Pitfalls Checklist</a></li><li class="chapter-item expanded "><a href="../thespis_impl/thespis_impl.html"><strong aria-hidden="true">5.</strong> thespis_impl</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../thespis_impl/desugar.html" class="active"><strong aria-hidden="true">5.1.</strong> Desugar Addr::builder()</a></li><li class="chapter-item expanded "><a href="../thespis_impl/supervision.html"><strong aria-hidden="true">5.2.</strong> Supervising an actor</a></li><li class="chapter-item expanded "><a href="../thespis_impl/concurrent.html"><strong aria-hidden="true">5.3.</strong> Processing messages concurrently</a></li></ol></li><li class="chapter-item expanded "><a href="../thespis_remote/introduction.html"><strong aria-hidden="true">6.</strong> thespis_remote</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -160,14 +162,14 @@
                 <div id="content" class="content">
                     <main>
                         <h1><a class="header" href="#desugar-addrbuilder" id="desugar-addrbuilder">Desugar Addr::builder()</a></h1>
-<p>Even if you will mostly be using the convenience builder to start your actors, its good to have an understanding of how things work at a lower level. So what would things look like if we wanted to manually create an actor? We will keep the simple example from the last chapter but desugar it. We already showed the desugaring of the <code>async_fn</code> macro. Here we show a full working example in which the main function is as desugared as we can get. Just know that there are intermediate steps on the builder API if you only want to override certain parameters.</p>
+<p>Even if you will mostly be using the convenience builder to start your actors, its good to have an understanding of how things work at a lower level. So what would things look like if we wanted to manually create an actor? We will keep the simple example from the last chapter but desugar it. We already showed the desugaring of the <code>async_fn</code> macro. Here we show a full working example with the main function as desugared as we can. Just know that there are intermediate steps on the builder API if you only want to override certain parameters.</p>
 <pre><pre class="playground"><code class="language-rust">use
 {
-	thespis         :: { *                         } ,
-	thespis_impl    :: { *                         } ,
-	async_executors :: { AsyncStd, SpawnHandleExt  } ,
-	std             :: { error::Error              } ,
-	futures         :: { channel::mpsc             } ,
+   thespis         :: { *                         } ,
+   thespis_impl    :: { *                         } ,
+   async_executors :: { AsyncStd, SpawnHandleExt  } ,
+   std             :: { error::Error              } ,
+   futures         :: { channel::mpsc             } ,
 };
 
 
@@ -180,16 +182,16 @@ struct Hello( String );
 
 impl Message for Hello
 {
-	type Return = String;
+   type Return = String;
 }
 
 
 impl Handler&lt; Hello &gt; for MyActor
 {
-	#[async_fn]	fn handle( &amp;mut self, _msg: Hello ) -&gt; String
-	{
-		&quot;world&quot;.into()
-	}
+   #[async_fn] fn handle( &amp;mut self, _msg: Hello ) -&gt; String
+   {
+      &quot;world&quot;.into()
+   }
 }
 
 
@@ -197,22 +199,22 @@ impl Handler&lt; Hello &gt; for MyActor
 //
 async fn main() -&gt; Result&lt; (), Box&lt;dyn Error&gt; &gt;
 {
-	let (tx, rx)  = mpsc::channel( 5 );
-	let tx        = Box::new( tx.sink_map_err( |e| Box::new(e) as SinkError ) );
-	let mb        = Mailbox::new( Some(&quot;HelloWorld&quot;.into()), Box::new(rx) );
-	let mut addr  = Addr::new( mb.id(), mb.name(), tx );
-	let actor     = MyActor;
+   let (tx, rx)  = mpsc::channel( 5 );
+   let tx        = Box::new( tx.sink_map_err( |e| Box::new(e) as SinkError ) );
+   let mb        = Mailbox::new( Some(&quot;HelloWorld&quot;.into()), Box::new(rx) );
+   let mut addr  = Addr::new( mb.id(), mb.name(), tx );
+   let actor     = MyActor;
 
-	let handle = AsyncStd.spawn_handle( mb.start( actor ) )?;
+   let handle = AsyncStd.spawn_handle( mb.start( actor ) )?;
 
-	let result = addr.call( Hello( &quot;hello&quot;.into() ) ).await?;
+   let result = addr.call( Hello( &quot;hello&quot;.into() ) ).await?;
 
-	assert_eq!( &quot;world&quot;, dbg!(result) );
+   assert_eq!( &quot;world&quot;, dbg!(result) );
 
-	drop( addr );
-	handle.await;
+   drop( addr );
+   handle.await;
 
-	Ok(())
+   Ok(())
 }
 </code></pre></pre>
 <h2><a class="header" href="#channels" id="channels">Channels</a></h2>
@@ -226,21 +228,21 @@ async fn main() -&gt; Result&lt; (), Box&lt;dyn Error&gt; &gt;
 //
 pub trait CloneSink&lt;'a, Item, E&gt;: Sink&lt;Item, Error=E&gt; + Unpin + Send
 {
-	/// Clone this sink.
-	//
-	fn clone_sink( &amp;self ) -&gt; Box&lt; dyn CloneSink&lt;'a, Item, E&gt; + 'a &gt;;
+   /// Clone this sink.
+   //
+   fn clone_sink( &amp;self ) -&gt; Box&lt; dyn CloneSink&lt;'a, Item, E&gt; + 'a &gt;;
 }
 
 
 impl&lt;'a, T, Item, E&gt; CloneSink&lt;'a, Item, E&gt; for T
 
-	where T: 'a + Sink&lt;Item, Error=E&gt; + Clone + Unpin + Send + ?Sized
+   where T: 'a + Sink&lt;Item, Error=E&gt; + Clone + Unpin + Send + ?Sized
 
 {
-	fn clone_sink( &amp;self ) -&gt; Box&lt; dyn CloneSink&lt;'a, Item, E&gt; + 'a &gt;
-	{
-		Box::new( self.clone() )
-	}
+   fn clone_sink( &amp;self ) -&gt; Box&lt; dyn CloneSink&lt;'a, Item, E&gt; + 'a &gt;
+   {
+      Box::new( self.clone() )
+   }
 }
 
 
@@ -267,8 +269,8 @@ pub type ChanReceiver&lt;A&gt; = Box&lt; dyn futures::Stream&lt;Item=BoxEnvelope
 let mut addr = Addr::new( mb.id(), mb.name(), tx );
 <span class="boring">}
 </span></code></pre></pre>
-<p>You can see that the constructors take a few parameters. The first parameter on <code>Mailbox::new</code> is an optional name. This will be used in logging to help you identify which actor is doing what. The id in the second line is similar but is just a numeric counter. Every mailbox created in the process will have a unique numeric id, but you can also name them to make it easier to understand your logs.</p>
-<p>We feed both ends to the constructors of <code>Mailbox</code> and <code>Addr</code>. You may notice that we just created both the mailbox and the address without even having instantiated an actor yet. That is because we only really need an actor when we start the mailbox. This has an interesting property. If we want our actor to have a copy of it's own address, we can just pass it along in it's constructor, since as soon as we start it we can only communicate to it through messages. It would be a bit of a pain to have to create a specific message type to give the actor it's own address.</p>
+<p>You can see that the constructors take a few parameters. The first parameter on <code>Mailbox::new</code> is an optional name. This will be used in logging to help you identify which actor is doing what. The id in the second line is similar but is just a numeric counter. Every mailbox created in the process will have a unique numeric id, but you can also name them to make it easier to understand your logs. <code>Addr</code> also exposes both the <code>id</code> and <code>name</code>. If two addresses return the same <code>id</code>, they both talk to the same mailbox and thus actor.</p>
+<p>We feed both ends of the channel to the constructors of <code>Mailbox</code> and <code>Addr</code>. You may notice that we just created both the mailbox and the address without even having instantiated an actor yet. That is because we only really need an actor when we start the mailbox. This has an interesting property. If we want our actor to have a copy of it's own address, we can just pass it along in it's constructor, since as soon as we start it we can only communicate to it through messages. It would be a bit of a pain to have to create a specific message type to give the actor it's own address.</p>
 <h2><a class="header" href="#starting-the-mailbox" id="starting-the-mailbox">Starting the mailbox</a></h2>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
@@ -278,7 +280,7 @@ let handle = AsyncStd.spawn_handle( mb.start( actor ) )?;
 <span class="boring">}
 </span></code></pre></pre>
 <p>Next we create an actor and pass it to <code>Mailbox::start</code>. This method returns a future that you can spawn however way you like on the executor of your choice. <code>Mailbox</code> has a a few convenience methods as well which allow you to pass the executor by reference which avoids having to import the spawn traits as well as local versions for spawning actors that aren't <code>Send</code>. Check the API docs.</p>
-<p>We use the <code>AsyncStd</code> wrapper from async_executors here. One essential difference with using <code>async-std</code> directly is that the joinhandle this returns will cancel the future when you drop it, which is a way you can stop an actor. The recommended way is to drop all addresses to the actor.</p>
+<p>We use the <code>AsyncStd</code> wrapper from <em>async_executors</em> here. One essential difference with using <code>async-std</code> directly is that the joinhandle this returns will cancel the future when you drop it, which is a way you can stop an actor. The recommended way is to drop all addresses to the actor.</p>
 <h2><a class="header" href="#stopping-the-actor" id="stopping-the-actor">Stopping the actor</a></h2>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
@@ -300,7 +302,7 @@ handle.await;
                         
 
                         
-                            <a rel="next" href="../thespis_remote/introduction.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="../thespis_impl/supervision.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         
@@ -318,7 +320,7 @@ handle.await;
                 
 
                 
-                    <a rel="next" href="../thespis_remote/introduction.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="../thespis_impl/supervision.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                 

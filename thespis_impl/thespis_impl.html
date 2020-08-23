@@ -41,6 +41,8 @@
 
         <!-- Custom theme stylesheets -->
         
+        <link rel="stylesheet" href="../custom.css">
+        
 
         
     </head>
@@ -93,7 +95,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../actor_model.html"><strong aria-hidden="true">2.</strong> What is the actor model?</a></li><li class="chapter-item expanded "><a href="../what_is_thespis.html"><strong aria-hidden="true">3.</strong> What is thespis?</a></li><li class="chapter-item expanded "><a href="../pitfalls.html"><strong aria-hidden="true">4.</strong> Pitfalls Checklist</a></li><li class="chapter-item expanded "><a href="../thespis_impl/thespis_impl.html" class="active"><strong aria-hidden="true">5.</strong> thespis_impl</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../thespis_impl/desugar.html"><strong aria-hidden="true">5.1.</strong> Desugar Addr::builder()</a></li></ol></li><li class="chapter-item expanded "><a href="../thespis_remote/introduction.html"><strong aria-hidden="true">6.</strong> thespis_remote</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../actor_model.html"><strong aria-hidden="true">2.</strong> What is the actor model?</a></li><li class="chapter-item expanded "><a href="../what_is_thespis.html"><strong aria-hidden="true">3.</strong> What is thespis?</a></li><li class="chapter-item expanded "><a href="../pitfalls.html"><strong aria-hidden="true">4.</strong> Pitfalls Checklist</a></li><li class="chapter-item expanded "><a href="../thespis_impl/thespis_impl.html" class="active"><strong aria-hidden="true">5.</strong> thespis_impl</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../thespis_impl/desugar.html"><strong aria-hidden="true">5.1.</strong> Desugar Addr::builder()</a></li><li class="chapter-item expanded "><a href="../thespis_impl/supervision.html"><strong aria-hidden="true">5.2.</strong> Supervising an actor</a></li><li class="chapter-item expanded "><a href="../thespis_impl/concurrent.html"><strong aria-hidden="true">5.3.</strong> Processing messages concurrently</a></li></ol></li><li class="chapter-item expanded "><a href="../thespis_remote/introduction.html"><strong aria-hidden="true">6.</strong> thespis_remote</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -163,10 +165,10 @@
 <p>This is the reference implementation. This chapter goes over it's features and provides you with example code. The most basic example, hello world:</p>
 <pre><pre class="playground"><code class="language-rust">use
 {
-	thespis         :: { *            } ,
-	thespis_impl    :: { *            } ,
-	async_executors :: { AsyncStd     } ,
-	std             :: { error::Error } ,
+   thespis         :: { *            } ,
+   thespis_impl    :: { *            } ,
+   async_executors :: { AsyncStd     } ,
+   std             :: { error::Error } ,
 };
 
 
@@ -179,16 +181,16 @@ struct Hello( String );
 
 impl Message for Hello
 {
-	type Return = String;
+   type Return = String;
 }
 
 
 impl Handler&lt; Hello &gt; for MyActor
 {
-	#[async_fn]	fn handle( &amp;mut self, _msg: Hello ) -&gt; String
-	{
-		&quot;world&quot;.into()
-	}
+   #[async_fn] fn handle( &amp;mut self, _msg: Hello ) -&gt; String
+   {
+      &quot;world&quot;.into()
+   }
 }
 
 
@@ -196,13 +198,13 @@ impl Handler&lt; Hello &gt; for MyActor
 //
 async fn main() -&gt; Result&lt; (), Box&lt;dyn Error&gt; &gt;
 {
-	let mut addr = Addr::builder().start( MyActor, &amp;AsyncStd )?;
+   let mut addr = Addr::builder().start( MyActor, &amp;AsyncStd )?;
 
-	let result = addr.call( Hello( &quot;hello&quot;.into() ) ).await?;
+   let result = addr.call( Hello( &quot;hello&quot;.into() ) ).await?;
 
-	assert_eq!( &quot;world&quot;, result );
+   assert_eq!( &quot;world&quot;, result );
 
-	Ok(())
+   Ok(())
 }
 </code></pre></pre>
 <h2><a class="header" href="#discussion" id="discussion">Discussion</a></h2>
@@ -223,7 +225,7 @@ struct MyActor;
 
 impl Message for Hello
 {
-	type Return = String;
+   type Return = String;
 }
 <span class="boring">}
 </span></code></pre></pre>
@@ -234,15 +236,15 @@ impl Message for Hello
 </span><span class="boring">fn main() {
 </span>impl Handler&lt; Hello &gt; for MyActor
 {
-	#[async_fn]	fn handle( &amp;mut self, _msg: Hello ) -&gt; String
-	{
-		&quot;world&quot;.into()
-	}
+   #[async_fn] fn handle( &amp;mut self, _msg: Hello ) -&gt; String
+   {
+      &quot;world&quot;.into()
+   }
 }
 <span class="boring">}
 </span></code></pre></pre>
-<p>Here we define that <code>MyActor</code> can process messages of type <code>Hello</code>. The body of the function does the actual processing. As you can see it receives a <code>&amp;mut self</code>, even though we know that all messages are sent asynchronously. This is the main advantage of the actor model. Even though any place in your code that has this actor's address can easily send messages, you never need thread sync like locks on your data. Only this actor can access it's own state directly and the only way to communicate with it is through sending messages. Further more the mailbox will make the actor process one message at a time, so there is never shared mutual access the the state.</p>
-<p>Using plain Object Oriented Programming in async Rust with methods that access state is very difficult, since as soon as you spawn any task, that task cannot hold any references to anything outside of it and to make matters worse, you can never hold a mutex across an await point.</p>
+<p>Here we define that <code>MyActor</code> can process messages of type <code>Hello</code>. The body of the function does the actual processing. As you can see it receives a <code>&amp;mut self</code>, even though we know that all messages are sent asynchronously. This is the main advantage of the actor model. Even though any place in your code that has this actor's address can easily send messages, you never need thread sync like locks on your data. Only this actor can access it's own state directly and the only way to communicate with it is through sending messages. Further more the mailbox will make the actor process one message at a time, so there is never shared mutual access to the state.</p>
+<p>Using plain Object Oriented Programming in async Rust with methods that access state is very difficult, since as soon as you spawn any task, that task cannot hold any references to anything outside of it and to make matters worse, you shouldn't hold a mutex across an await point. The actor model sidesteps these problems, as any code that needs to communicate with an actor only needs the address, not a reference to the actor itself. <code>Addr</code> implements clone, so you can have many places of your program talk to the actor.</p>
 <p>The <code>async_fn</code> macro deals with the fact that Rust doesn't support async trait methods at the moment. It does this in a very similar way as the <em>async-trait</em> crate, but it outputs much simpler code, making it compatible with a hand written version of this method, which was not possible with <em>async-trait</em>.</p>
 <p>A handwritten version would look like:</p>
 <pre><pre class="playground"><code class="language-rust">
@@ -250,13 +252,13 @@ impl Message for Hello
 </span><span class="boring">fn main() {
 </span>impl Handler&lt; Hello &gt; for MyActor
 {
-	fn handle( &amp;mut self, _msg: Hello ) -&gt; Return&lt;'_, String&gt;
-	{
-		Box::pin( async
-		{
-			&quot;world&quot;.into()
-		})
-	}
+   fn handle( &amp;mut self, _msg: Hello ) -&gt; Return&lt;'_, String&gt;
+   {
+      Box::pin( async
+      {
+         &quot;world&quot;.into()
+      })
+   }
 }
 <span class="boring">}
 </span></code></pre></pre>
@@ -287,8 +289,8 @@ allowing us to be executor agnostic. We could just as well have given it a <code
 </span>let result = addr.call( Ping( &quot;hello&quot;.into() ) ).await?;
 <span class="boring">}
 </span></code></pre></pre>
-<p>We use <code>Address::call</code> to send a message to our actor. This method will return to us a future that will resolve to the answer our handler returns. Note that <code>Addr</code> also implements <code>futures_sink::Sink</code>. The <code>send</code> method from the <code>Sink</code> trait will drop the returned value and will return to us as soon as the message is delivered to the mailbox, without waiting for the actor to process the message.</p>
-<p>Thus you can also use the <code>call</code> method even if you don't want to return any value to be sure that the message has been processed, where as <code>send</code> is more like throwing a message in a bottle. You will still get back pressure from <code>send</code> as it will block when the channel between the <code>Addr</code> and the mailbox is full.</p>
+<p>We use <code>Address::call</code> to send a message to our actor. This method will return to us a future that will resolve to the answer our handler returns. Note that <code>Addr</code> also implements <code>futures_sink::Sink</code>. You can use the combinators from the futures crate to forward an entire stream into the address, as long as the actor implements <code>Handler</code> for the type the stream produces. The <code>send</code> method from the <code>Sink</code> trait will drop the returned value and will return to us as soon as the message is delivered to the mailbox, without waiting for the actor to process the message.</p>
+<p>Thus you can also use the <code>call</code> method even if you don't want to return any value to be sure that the message has been processed, where as <code>send</code> is more like throwing a message in a bottle. You will still get back pressure from <code>send</code> as it will block when the channel between the <code>Addr</code> and the mailbox is full (as long as it's not an unbounded channel that is).</p>
 <p>In the next chapter we will take a look at desugaring the builder and manually create our mailbox and address.</p>
 
                     </main>

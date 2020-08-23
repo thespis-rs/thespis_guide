@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>thespis_remote - Thespis User Guide</title>
+        <title>Processing messages concurrently - Thespis User Guide</title>
         
         
 
@@ -95,7 +95,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../actor_model.html"><strong aria-hidden="true">2.</strong> What is the actor model?</a></li><li class="chapter-item expanded "><a href="../what_is_thespis.html"><strong aria-hidden="true">3.</strong> What is thespis?</a></li><li class="chapter-item expanded "><a href="../pitfalls.html"><strong aria-hidden="true">4.</strong> Pitfalls Checklist</a></li><li class="chapter-item expanded "><a href="../thespis_impl/thespis_impl.html"><strong aria-hidden="true">5.</strong> thespis_impl</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../thespis_impl/desugar.html"><strong aria-hidden="true">5.1.</strong> Desugar Addr::builder()</a></li><li class="chapter-item expanded "><a href="../thespis_impl/supervision.html"><strong aria-hidden="true">5.2.</strong> Supervising an actor</a></li><li class="chapter-item expanded "><a href="../thespis_impl/concurrent.html"><strong aria-hidden="true">5.3.</strong> Processing messages concurrently</a></li></ol></li><li class="chapter-item expanded "><a href="../thespis_remote/introduction.html" class="active"><strong aria-hidden="true">6.</strong> thespis_remote</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../actor_model.html"><strong aria-hidden="true">2.</strong> What is the actor model?</a></li><li class="chapter-item expanded "><a href="../what_is_thespis.html"><strong aria-hidden="true">3.</strong> What is thespis?</a></li><li class="chapter-item expanded "><a href="../pitfalls.html"><strong aria-hidden="true">4.</strong> Pitfalls Checklist</a></li><li class="chapter-item expanded "><a href="../thespis_impl/thespis_impl.html"><strong aria-hidden="true">5.</strong> thespis_impl</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../thespis_impl/desugar.html"><strong aria-hidden="true">5.1.</strong> Desugar Addr::builder()</a></li><li class="chapter-item expanded "><a href="../thespis_impl/supervision.html"><strong aria-hidden="true">5.2.</strong> Supervising an actor</a></li><li class="chapter-item expanded "><a href="../thespis_impl/concurrent.html" class="active"><strong aria-hidden="true">5.3.</strong> Processing messages concurrently</a></li></ol></li><li class="chapter-item expanded "><a href="../thespis_remote/introduction.html"><strong aria-hidden="true">6.</strong> thespis_remote</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -161,34 +161,134 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#introduction-to-thespis_remote" id="introduction-to-thespis_remote">Introduction to thespis_remote.</a></h1>
-<p><em>Thespis_remote</em> adds support for remote actors to the thespis actor model. It follows the same rather low level approach as the rest of <em>thespis</em>. That means it provides the ability to send actor messages over one connection. The connection <em>thespis_remote</em> works over is a <code>Sink</code> and <code>Stream</code> of a given wire format. This with an encoder/decoder it works over anything that implements <code>AsyncRead</code>/<code>AsyncWrite</code>.</p>
-<p>There is no &quot;system&quot; or discovery integrated. It requires you to connect two processes by any means of your choice and provide the above interfaces to <em>thespis_remote</em>. From there <em>thespis_remote</em> provides:</p>
-<ul>
-<li><code>RemoteAddr</code> which allows you to send messages as if you were sending to an actor in the same process.</li>
-<li><code>ServiceMap</code>, a trait and provided reference impl that knows how to deserialize your actor messages and dispatch them to the right actor. Note that you can only set one actor per message type per service map, so you are actually sending to a remote process rather than to an individual actor in that process. However you can easily wrap your message with an actor id and provide more precise delivery if you want.</li>
-<li><code>WireFormat</code>, a trait and reference impl for the actual wire format used.</li>
-<li><code>Peer</code>, an actor that manages a connection endpoint. You provide it with a service map to &quot;serve&quot; over the connection and you pass it when you create <code>RemoteAddr</code> stating that you know that the other side of the connection managed by this <code>Peer</code> exposes the services you</li>
-</ul>
-<p>These are the four core components of the library.</p>
-<p><em>thespis_remote</em> also provides relaying of messages. Further some features are included to deal with back pressure and to make it resistant to attacks like DOS and slow loris.</p>
-<p>Apart from this guide you can also consult the <a href="https://docs.rs/thespis_remote">API documentation</a> and the <a href="https://github.com/thespis-rs/thespis_remote/tree/master/examples">examples</a>.</p>
-<h1><a class="header" href="#design" id="design">Design</a></h1>
-<p>You might feel cheated that you can't address individual actors on a remote process. There are good reasons for this however and nothing stops you from implementing this functionality on top of <em>thespis_remote</em>. In <em>thespis</em> everything is as much as possible statically type checked. By considering a process that exposes it's possibility to receive messages of certain types, we adhere to a public interface like a contract. It allows a remote process to statically create addresses to send us messages, rather than having to send over addresses at runtime.</p>
-<p>Actors can accept several types of messages, but some of those might not be meant for external use. If we were to expose an address to this actor as is, all of it's interface would be remotely exposed. We would also need to compile in the actor type in the remote process, where with the current design only message types need to be shared between the two processes.</p>
-<p><em>thespis_remote</em> is minimal in the sense that it creates the fundamental building block for remote actor communication. Systems, discovery and individual actor addressing can all be implemented on top of it.</p>
-<p>Several components of the library can easily be customized. The traits <code>WireFormat</code> and <code>ServiceMap</code> allow you to create your own specialized implementations if desired.</p>
+                        <h1><a class="header" href="#processing-messages-concurrently" id="processing-messages-concurrently">Processing messages concurrently</a></h1>
+<p>In principle an actor processes one message at a time. This restriction only makes sense however if the actor has mutable state. This avoids all synchronization problems. But what if your actor doesn't have mutable state? In that case we can process messages concurrently without any issues.</p>
+<pre><pre class="playground"><code class="language-rust">use
+{
+   thespis           :: { *                                                 } ,
+   thespis_impl      :: { *                                                 } ,
+   std               :: { error::Error                                      } ,
+   futures           :: { FutureExt, task::{ SpawnError }                   } ,
+   async_executors   :: { AsyncStd, SpawnHandle, SpawnHandleExt, JoinHandle } ,
+   async_nursery     :: { Nursery, NurseErr, Nurse, NurseExt                } ,
+};
+
+
+type DynError = Box&lt;dyn Error + Send + Sync&gt;;
+
+
+#[ derive( Actor ) ]
+//
+struct MyActor
+{
+   // We store the nursery_handle on our actor. That way the lifetime of all
+   // tasks inside the nursery is tied to the lifetime of our actor. If we drop
+   // the actor, all subtasks that are still running will be dropped.
+   //
+   // Alternatively we could have a Handler for a Stop message, which would await
+   // the nursery_handle to wait for all subtasks to finish before dropping this actor.
+   // That last one can even be combined with a timeout to limit how long we wait for
+   // subtasks to finish naturally before dropping them.
+   //
+   nursery: Box&lt; dyn Nurse&lt;()&gt; + Send &gt;,
+   _nursery_handle: JoinHandle&lt;()&gt;,
+}
+
+
+struct Ping;
+
+impl Message for Ping { type Return = Result&lt;(), NurseErr&gt;; }
+
+
+impl MyActor
+{
+   pub fn new( exec: impl SpawnHandle&lt;()&gt; + Clone + Send + 'static ) -&gt; Result&lt;Self, SpawnError&gt;
+   {
+      let (nursery, output) = Nursery::new( Box::new( exec.clone() ) );
+
+      let _nursery_handle = exec.spawn_handle( output )?;
+      let nursery         = Box::new( nursery );
+
+      Ok( Self
+      {
+          nursery        ,
+         _nursery_handle ,
+      })
+   }
+}
+
+
+impl Handler&lt;Ping&gt; for MyActor
+{
+   // For this usecase we don't use the `async_fn` macro since we don't want our entire
+   // handler to be in the returned future. We want to set some thing up first.
+   //
+   fn handle( &amp;mut self, _msg: Ping ) -&gt; Return&lt;'_, &lt;Ping as Message&gt;::Return &gt;
+   {
+      // If self had properties wrapped in Arc, we could clone them here to pass them
+      // into the future.
+      //
+      // However we can't actually pass the reference to self in if we want it
+      // to run concurrently.
+      //
+      // In theory you can have something in an Arc&lt;Mutex&gt;&gt; or atomic variables, but
+      // you really must be careful. As these run concurrently, values will change in the
+      // middle of processing which is a footgun.
+      //
+      // If we would need to update self with the result of an async operation, we can
+      // store our own address on self, clone that to pass it into the spawned task
+      // and send the result to ourselves.
+      //
+      let processing = async move
+      {
+         // do something useful.
+      };
+
+      // Processing will now run concurrently.
+      //
+      let result = self.nursery.nurse( processing );
+
+      // If spawning failed, we pass that back to caller.
+      // We are now immediately ready to process the next message even while processing is
+      // still running.
+      //
+      // We return the result of processing to the caller.
+      //
+      async move { result }.boxed()
+   }
+}
+
+
+#[async_std::main]
+//
+async fn main() -&gt; Result&lt; (), DynError &gt;
+{
+   let     actor = MyActor::new( Box::new(AsyncStd) )?;
+   let mut addr  = Addr::builder().start( actor, &amp;AsyncStd )?;
+
+   // Admittedly, this looks a bit weird. Call is fallible, and it returns a result over
+   // the NurseErr, since the handler needs to spawn and spawning is fallible.
+   //
+   addr.call( Ping ).await??;
+
+   Ok(())
+}
+</code></pre></pre>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                         
-                            <a rel="prev" href="../thespis_impl/concurrent.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../thespis_impl/supervision.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
                         
 
+                        
+                            <a rel="next" href="../thespis_remote/introduction.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
                         
 
                         <div style="clear: both"></div>
@@ -198,11 +298,15 @@
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
-                    <a rel="prev" href="../thespis_impl/concurrent.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../thespis_impl/supervision.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 
 
+                
+                    <a rel="next" href="../thespis_remote/introduction.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
                 
             </nav>
 

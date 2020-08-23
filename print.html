@@ -43,6 +43,8 @@
 
         <!-- Custom theme stylesheets -->
         
+        <link rel="stylesheet" href="custom.css">
+        
 
         
     </head>
@@ -95,7 +97,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="actor_model.html"><strong aria-hidden="true">2.</strong> What is the actor model?</a></li><li class="chapter-item expanded "><a href="what_is_thespis.html"><strong aria-hidden="true">3.</strong> What is thespis?</a></li><li class="chapter-item expanded "><a href="pitfalls.html"><strong aria-hidden="true">4.</strong> Pitfalls Checklist</a></li><li class="chapter-item expanded "><a href="thespis_impl/thespis_impl.html"><strong aria-hidden="true">5.</strong> thespis_impl</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="thespis_impl/desugar.html"><strong aria-hidden="true">5.1.</strong> Desugar Addr::builder()</a></li></ol></li><li class="chapter-item expanded "><a href="thespis_remote/introduction.html"><strong aria-hidden="true">6.</strong> thespis_remote</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="actor_model.html"><strong aria-hidden="true">2.</strong> What is the actor model?</a></li><li class="chapter-item expanded "><a href="what_is_thespis.html"><strong aria-hidden="true">3.</strong> What is thespis?</a></li><li class="chapter-item expanded "><a href="pitfalls.html"><strong aria-hidden="true">4.</strong> Pitfalls Checklist</a></li><li class="chapter-item expanded "><a href="thespis_impl/thespis_impl.html"><strong aria-hidden="true">5.</strong> thespis_impl</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="thespis_impl/desugar.html"><strong aria-hidden="true">5.1.</strong> Desugar Addr::builder()</a></li><li class="chapter-item expanded "><a href="thespis_impl/supervision.html"><strong aria-hidden="true">5.2.</strong> Supervising an actor</a></li><li class="chapter-item expanded "><a href="thespis_impl/concurrent.html"><strong aria-hidden="true">5.3.</strong> Processing messages concurrently</a></li></ol></li><li class="chapter-item expanded "><a href="thespis_remote/introduction.html"><strong aria-hidden="true">6.</strong> thespis_remote</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -231,10 +233,10 @@
 <p>This is the reference implementation. This chapter goes over it's features and provides you with example code. The most basic example, hello world:</p>
 <pre><pre class="playground"><code class="language-rust">use
 {
-	thespis         :: { *            } ,
-	thespis_impl    :: { *            } ,
-	async_executors :: { AsyncStd     } ,
-	std             :: { error::Error } ,
+   thespis         :: { *            } ,
+   thespis_impl    :: { *            } ,
+   async_executors :: { AsyncStd     } ,
+   std             :: { error::Error } ,
 };
 
 
@@ -247,16 +249,16 @@ struct Hello( String );
 
 impl Message for Hello
 {
-	type Return = String;
+   type Return = String;
 }
 
 
 impl Handler&lt; Hello &gt; for MyActor
 {
-	#[async_fn]	fn handle( &amp;mut self, _msg: Hello ) -&gt; String
-	{
-		&quot;world&quot;.into()
-	}
+   #[async_fn] fn handle( &amp;mut self, _msg: Hello ) -&gt; String
+   {
+      &quot;world&quot;.into()
+   }
 }
 
 
@@ -264,13 +266,13 @@ impl Handler&lt; Hello &gt; for MyActor
 //
 async fn main() -&gt; Result&lt; (), Box&lt;dyn Error&gt; &gt;
 {
-	let mut addr = Addr::builder().start( MyActor, &amp;AsyncStd )?;
+   let mut addr = Addr::builder().start( MyActor, &amp;AsyncStd )?;
 
-	let result = addr.call( Hello( &quot;hello&quot;.into() ) ).await?;
+   let result = addr.call( Hello( &quot;hello&quot;.into() ) ).await?;
 
-	assert_eq!( &quot;world&quot;, result );
+   assert_eq!( &quot;world&quot;, result );
 
-	Ok(())
+   Ok(())
 }
 </code></pre></pre>
 <h2><a class="header" href="#discussion" id="discussion">Discussion</a></h2>
@@ -291,7 +293,7 @@ struct MyActor;
 
 impl Message for Hello
 {
-	type Return = String;
+   type Return = String;
 }
 <span class="boring">}
 </span></code></pre></pre>
@@ -302,15 +304,15 @@ impl Message for Hello
 </span><span class="boring">fn main() {
 </span>impl Handler&lt; Hello &gt; for MyActor
 {
-	#[async_fn]	fn handle( &amp;mut self, _msg: Hello ) -&gt; String
-	{
-		&quot;world&quot;.into()
-	}
+   #[async_fn] fn handle( &amp;mut self, _msg: Hello ) -&gt; String
+   {
+      &quot;world&quot;.into()
+   }
 }
 <span class="boring">}
 </span></code></pre></pre>
-<p>Here we define that <code>MyActor</code> can process messages of type <code>Hello</code>. The body of the function does the actual processing. As you can see it receives a <code>&amp;mut self</code>, even though we know that all messages are sent asynchronously. This is the main advantage of the actor model. Even though any place in your code that has this actor's address can easily send messages, you never need thread sync like locks on your data. Only this actor can access it's own state directly and the only way to communicate with it is through sending messages. Further more the mailbox will make the actor process one message at a time, so there is never shared mutual access the the state.</p>
-<p>Using plain Object Oriented Programming in async Rust with methods that access state is very difficult, since as soon as you spawn any task, that task cannot hold any references to anything outside of it and to make matters worse, you can never hold a mutex across an await point.</p>
+<p>Here we define that <code>MyActor</code> can process messages of type <code>Hello</code>. The body of the function does the actual processing. As you can see it receives a <code>&amp;mut self</code>, even though we know that all messages are sent asynchronously. This is the main advantage of the actor model. Even though any place in your code that has this actor's address can easily send messages, you never need thread sync like locks on your data. Only this actor can access it's own state directly and the only way to communicate with it is through sending messages. Further more the mailbox will make the actor process one message at a time, so there is never shared mutual access to the state.</p>
+<p>Using plain Object Oriented Programming in async Rust with methods that access state is very difficult, since as soon as you spawn any task, that task cannot hold any references to anything outside of it and to make matters worse, you shouldn't hold a mutex across an await point. The actor model sidesteps these problems, as any code that needs to communicate with an actor only needs the address, not a reference to the actor itself. <code>Addr</code> implements clone, so you can have many places of your program talk to the actor.</p>
 <p>The <code>async_fn</code> macro deals with the fact that Rust doesn't support async trait methods at the moment. It does this in a very similar way as the <em>async-trait</em> crate, but it outputs much simpler code, making it compatible with a hand written version of this method, which was not possible with <em>async-trait</em>.</p>
 <p>A handwritten version would look like:</p>
 <pre><pre class="playground"><code class="language-rust">
@@ -318,13 +320,13 @@ impl Message for Hello
 </span><span class="boring">fn main() {
 </span>impl Handler&lt; Hello &gt; for MyActor
 {
-	fn handle( &amp;mut self, _msg: Hello ) -&gt; Return&lt;'_, String&gt;
-	{
-		Box::pin( async
-		{
-			&quot;world&quot;.into()
-		})
-	}
+   fn handle( &amp;mut self, _msg: Hello ) -&gt; Return&lt;'_, String&gt;
+   {
+      Box::pin( async
+      {
+         &quot;world&quot;.into()
+      })
+   }
 }
 <span class="boring">}
 </span></code></pre></pre>
@@ -355,18 +357,18 @@ allowing us to be executor agnostic. We could just as well have given it a <code
 </span>let result = addr.call( Ping( &quot;hello&quot;.into() ) ).await?;
 <span class="boring">}
 </span></code></pre></pre>
-<p>We use <code>Address::call</code> to send a message to our actor. This method will return to us a future that will resolve to the answer our handler returns. Note that <code>Addr</code> also implements <code>futures_sink::Sink</code>. The <code>send</code> method from the <code>Sink</code> trait will drop the returned value and will return to us as soon as the message is delivered to the mailbox, without waiting for the actor to process the message.</p>
-<p>Thus you can also use the <code>call</code> method even if you don't want to return any value to be sure that the message has been processed, where as <code>send</code> is more like throwing a message in a bottle. You will still get back pressure from <code>send</code> as it will block when the channel between the <code>Addr</code> and the mailbox is full.</p>
+<p>We use <code>Address::call</code> to send a message to our actor. This method will return to us a future that will resolve to the answer our handler returns. Note that <code>Addr</code> also implements <code>futures_sink::Sink</code>. You can use the combinators from the futures crate to forward an entire stream into the address, as long as the actor implements <code>Handler</code> for the type the stream produces. The <code>send</code> method from the <code>Sink</code> trait will drop the returned value and will return to us as soon as the message is delivered to the mailbox, without waiting for the actor to process the message.</p>
+<p>Thus you can also use the <code>call</code> method even if you don't want to return any value to be sure that the message has been processed, where as <code>send</code> is more like throwing a message in a bottle. You will still get back pressure from <code>send</code> as it will block when the channel between the <code>Addr</code> and the mailbox is full (as long as it's not an unbounded channel that is).</p>
 <p>In the next chapter we will take a look at desugaring the builder and manually create our mailbox and address.</p>
 <h1><a class="header" href="#desugar-addrbuilder" id="desugar-addrbuilder">Desugar Addr::builder()</a></h1>
-<p>Even if you will mostly be using the convenience builder to start your actors, its good to have an understanding of how things work at a lower level. So what would things look like if we wanted to manually create an actor? We will keep the simple example from the last chapter but desugar it. We already showed the desugaring of the <code>async_fn</code> macro. Here we show a full working example in which the main function is as desugared as we can get. Just know that there are intermediate steps on the builder API if you only want to override certain parameters.</p>
+<p>Even if you will mostly be using the convenience builder to start your actors, its good to have an understanding of how things work at a lower level. So what would things look like if we wanted to manually create an actor? We will keep the simple example from the last chapter but desugar it. We already showed the desugaring of the <code>async_fn</code> macro. Here we show a full working example with the main function as desugared as we can. Just know that there are intermediate steps on the builder API if you only want to override certain parameters.</p>
 <pre><pre class="playground"><code class="language-rust">use
 {
-	thespis         :: { *                         } ,
-	thespis_impl    :: { *                         } ,
-	async_executors :: { AsyncStd, SpawnHandleExt  } ,
-	std             :: { error::Error              } ,
-	futures         :: { channel::mpsc             } ,
+   thespis         :: { *                         } ,
+   thespis_impl    :: { *                         } ,
+   async_executors :: { AsyncStd, SpawnHandleExt  } ,
+   std             :: { error::Error              } ,
+   futures         :: { channel::mpsc             } ,
 };
 
 
@@ -379,16 +381,16 @@ struct Hello( String );
 
 impl Message for Hello
 {
-	type Return = String;
+   type Return = String;
 }
 
 
 impl Handler&lt; Hello &gt; for MyActor
 {
-	#[async_fn]	fn handle( &amp;mut self, _msg: Hello ) -&gt; String
-	{
-		&quot;world&quot;.into()
-	}
+   #[async_fn] fn handle( &amp;mut self, _msg: Hello ) -&gt; String
+   {
+      &quot;world&quot;.into()
+   }
 }
 
 
@@ -396,22 +398,22 @@ impl Handler&lt; Hello &gt; for MyActor
 //
 async fn main() -&gt; Result&lt; (), Box&lt;dyn Error&gt; &gt;
 {
-	let (tx, rx)  = mpsc::channel( 5 );
-	let tx        = Box::new( tx.sink_map_err( |e| Box::new(e) as SinkError ) );
-	let mb        = Mailbox::new( Some(&quot;HelloWorld&quot;.into()), Box::new(rx) );
-	let mut addr  = Addr::new( mb.id(), mb.name(), tx );
-	let actor     = MyActor;
+   let (tx, rx)  = mpsc::channel( 5 );
+   let tx        = Box::new( tx.sink_map_err( |e| Box::new(e) as SinkError ) );
+   let mb        = Mailbox::new( Some(&quot;HelloWorld&quot;.into()), Box::new(rx) );
+   let mut addr  = Addr::new( mb.id(), mb.name(), tx );
+   let actor     = MyActor;
 
-	let handle = AsyncStd.spawn_handle( mb.start( actor ) )?;
+   let handle = AsyncStd.spawn_handle( mb.start( actor ) )?;
 
-	let result = addr.call( Hello( &quot;hello&quot;.into() ) ).await?;
+   let result = addr.call( Hello( &quot;hello&quot;.into() ) ).await?;
 
-	assert_eq!( &quot;world&quot;, dbg!(result) );
+   assert_eq!( &quot;world&quot;, dbg!(result) );
 
-	drop( addr );
-	handle.await;
+   drop( addr );
+   handle.await;
 
-	Ok(())
+   Ok(())
 }
 </code></pre></pre>
 <h2><a class="header" href="#channels" id="channels">Channels</a></h2>
@@ -425,21 +427,21 @@ async fn main() -&gt; Result&lt; (), Box&lt;dyn Error&gt; &gt;
 //
 pub trait CloneSink&lt;'a, Item, E&gt;: Sink&lt;Item, Error=E&gt; + Unpin + Send
 {
-	/// Clone this sink.
-	//
-	fn clone_sink( &amp;self ) -&gt; Box&lt; dyn CloneSink&lt;'a, Item, E&gt; + 'a &gt;;
+   /// Clone this sink.
+   //
+   fn clone_sink( &amp;self ) -&gt; Box&lt; dyn CloneSink&lt;'a, Item, E&gt; + 'a &gt;;
 }
 
 
 impl&lt;'a, T, Item, E&gt; CloneSink&lt;'a, Item, E&gt; for T
 
-	where T: 'a + Sink&lt;Item, Error=E&gt; + Clone + Unpin + Send + ?Sized
+   where T: 'a + Sink&lt;Item, Error=E&gt; + Clone + Unpin + Send + ?Sized
 
 {
-	fn clone_sink( &amp;self ) -&gt; Box&lt; dyn CloneSink&lt;'a, Item, E&gt; + 'a &gt;
-	{
-		Box::new( self.clone() )
-	}
+   fn clone_sink( &amp;self ) -&gt; Box&lt; dyn CloneSink&lt;'a, Item, E&gt; + 'a &gt;
+   {
+      Box::new( self.clone() )
+   }
 }
 
 
@@ -466,8 +468,8 @@ pub type ChanReceiver&lt;A&gt; = Box&lt; dyn futures::Stream&lt;Item=BoxEnvelope
 let mut addr = Addr::new( mb.id(), mb.name(), tx );
 <span class="boring">}
 </span></code></pre></pre>
-<p>You can see that the constructors take a few parameters. The first parameter on <code>Mailbox::new</code> is an optional name. This will be used in logging to help you identify which actor is doing what. The id in the second line is similar but is just a numeric counter. Every mailbox created in the process will have a unique numeric id, but you can also name them to make it easier to understand your logs.</p>
-<p>We feed both ends to the constructors of <code>Mailbox</code> and <code>Addr</code>. You may notice that we just created both the mailbox and the address without even having instantiated an actor yet. That is because we only really need an actor when we start the mailbox. This has an interesting property. If we want our actor to have a copy of it's own address, we can just pass it along in it's constructor, since as soon as we start it we can only communicate to it through messages. It would be a bit of a pain to have to create a specific message type to give the actor it's own address.</p>
+<p>You can see that the constructors take a few parameters. The first parameter on <code>Mailbox::new</code> is an optional name. This will be used in logging to help you identify which actor is doing what. The id in the second line is similar but is just a numeric counter. Every mailbox created in the process will have a unique numeric id, but you can also name them to make it easier to understand your logs. <code>Addr</code> also exposes both the <code>id</code> and <code>name</code>. If two addresses return the same <code>id</code>, they both talk to the same mailbox and thus actor.</p>
+<p>We feed both ends of the channel to the constructors of <code>Mailbox</code> and <code>Addr</code>. You may notice that we just created both the mailbox and the address without even having instantiated an actor yet. That is because we only really need an actor when we start the mailbox. This has an interesting property. If we want our actor to have a copy of it's own address, we can just pass it along in it's constructor, since as soon as we start it we can only communicate to it through messages. It would be a bit of a pain to have to create a specific message type to give the actor it's own address.</p>
 <h2><a class="header" href="#starting-the-mailbox" id="starting-the-mailbox">Starting the mailbox</a></h2>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
@@ -477,7 +479,7 @@ let handle = AsyncStd.spawn_handle( mb.start( actor ) )?;
 <span class="boring">}
 </span></code></pre></pre>
 <p>Next we create an actor and pass it to <code>Mailbox::start</code>. This method returns a future that you can spawn however way you like on the executor of your choice. <code>Mailbox</code> has a a few convenience methods as well which allow you to pass the executor by reference which avoids having to import the spawn traits as well as local versions for spawning actors that aren't <code>Send</code>. Check the API docs.</p>
-<p>We use the <code>AsyncStd</code> wrapper from async_executors here. One essential difference with using <code>async-std</code> directly is that the joinhandle this returns will cancel the future when you drop it, which is a way you can stop an actor. The recommended way is to drop all addresses to the actor.</p>
+<p>We use the <code>AsyncStd</code> wrapper from <em>async_executors</em> here. One essential difference with using <code>async-std</code> directly is that the joinhandle this returns will cancel the future when you drop it, which is a way you can stop an actor. The recommended way is to drop all addresses to the actor.</p>
 <h2><a class="header" href="#stopping-the-actor" id="stopping-the-actor">Stopping the actor</a></h2>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
@@ -487,6 +489,273 @@ handle.await;
 <span class="boring">}
 </span></code></pre></pre>
 <p>As described above, to drop an actor we drop all addresses to it. Now we can await the mailbox which will terminate.</p>
+<h1><a class="header" href="#supervising-an-actor" id="supervising-an-actor">Supervising an actor</a></h1>
+<p>A common pattern in actor software is supervision. The idea is to monitor a hierarchy of actors and if any one crashes, it's supervisor will spawn a new one to replace it. This is a strategy for more robust software. In terms of Rust actors, I would rather suggest you try to make your handlers panic free, and let them return a <code>Result</code> that you can handle if they are fallible, but that is not always possible and you can use the supervision pattern with thespis.</p>
+<p>The following example is relatively straightforward. The main feature allowing supervising in thespis is that the mailbox future returns the mailbox to you if the actor panics while processing a message. This means that you can just instantiate a new actor and spawn the mailbox again and it will be fully operational. All addresses to it will just remain valid.</p>
+<p><strong>Warning</strong>: This does mean that mailbox uses catch unwind on your handlers. That means they should be unwindsafe, but as you shouldn't be using shared mutability anyway this should already be the case.</p>
+<pre><pre class="playground"><code class="language-rust">use
+{
+   thespis           :: { *                    } ,
+   thespis_impl      :: { *                    } ,
+   tracing           :: { *                    } ,
+   futures::task     :: { Spawn, SpawnExt      } ,
+   std               :: { error::Error         } ,
+   async_executors   :: { AsyncStd, JoinHandle } ,
+};
+
+
+#[ derive( Actor ) ] struct Counter;
+
+struct Add(usize);
+
+
+impl Message for Add  { type Return = usize; }
+
+
+// This is a silly actor, if you send it an even number, it panics.
+// Otherwise it returns your number to you.
+//
+impl Handler&lt; Add &gt; for Counter
+{
+   #[async_fn] fn handle( &amp;mut self, msg: Add ) -&gt; usize
+   {
+      if msg.0 % 2 == 0 { panic!(); }
+
+      msg.0
+   }
+}
+
+
+// Actor that can supervise other actors. It will start the actor for the first time
+// if it's not already started.
+//
+#[ derive( Actor ) ]
+//
+struct Supervisor
+{
+   // We will need to spawn the mailbox again if the actor panics, so we need an executor.
+   // If you want to make this more hierarchical, you can use a nursery from the async_nursery
+   // crate to tie all these subtasks to the lifetime of the supervisor and prevent them from
+   // getting orphaned.
+   //
+   exec: Box&lt;dyn Spawn + Send&gt;
+}
+
+
+// The message we will be sending.
+//
+struct Supervise&lt;A: Actor&gt;
+{
+   mailbox : Option&lt; JoinHandle&lt;Option&lt;Mailbox&lt;A&gt;&gt;&gt; &gt; ,
+
+   // A closure that knows how to instantiate the supervised actor.
+   //
+   create: Box&lt; dyn FnMut() -&gt;A + Send &gt; ,
+}
+
+impl&lt;A: Actor + Send&gt; Message for Supervise&lt;A&gt;
+{
+   type Return = Option&lt; Addr&lt;A&gt; &gt;;
+}
+
+
+// Note how the actor type is a generic parameter, so this supervisor works for
+// actors of any type.
+//
+impl&lt;A: Actor + Send&gt; Handler&lt; Supervise&lt;A&gt; &gt; for Supervisor
+{
+   #[async_fn] fn handle( &amp;mut self, mut actor: Supervise&lt;A&gt; ) -&gt; Option&lt; Addr&lt;A&gt; &gt;
+   {
+      let mut addr = None;
+
+      let mut mb_handle = if actor.mailbox.is_none()
+      {
+         let (addr_new, mb_handle) = Addr::builder().start_handle( (actor.create)(), &amp;AsyncStd ).unwrap();
+
+         addr = Some(addr_new);
+
+         mb_handle
+      }
+
+      else { actor.mailbox.take().unwrap() };
+
+
+      let supervisor = async move
+      {
+         // This is where the magic happens. Every time the handle resolves, we spawn again
+         // and replace it with a new handle.
+         //
+         // When this returns None, it means the actor has stopped naturally and we don't respawn it.
+         //
+         while let Some(mb) = mb_handle.await
+         {
+            mb_handle = mb.start_handle( (actor.create)(), &amp;AsyncStd ).unwrap();
+         }
+      };
+
+      self.exec.spawn( supervisor ).unwrap();
+
+      addr
+   }
+}
+
+
+#[async_std::main]
+//
+async fn main() -&gt; Result&lt; (), Box&lt;dyn Error&gt; &gt;
+{
+   tracing_subscriber::fmt::Subscriber::builder()
+
+      .with_max_level( Level::DEBUG )
+      .init()
+   ;
+
+   let mut supervisor = Addr::builder().start( Supervisor{ exec: Box::new( AsyncStd ) }, &amp;AsyncStd )?;
+
+
+   // Here we use a closure to create new actors, but if you don't need to capture
+   // anything from the environment you might as well just implement `Default` for
+   // your actor type.
+   //
+   let create = Box::new( ||
+   {
+      debug!( &quot;Creating a new Counter&quot; );
+      Counter
+   });
+
+   let supervise = Supervise
+   {
+      create,
+      mailbox: None,
+   };
+
+   let mut addr = supervisor.call( supervise ).await?.unwrap();
+
+   // Both of these will make the actor panic:
+   //
+   assert!(matches!( addr.call( Add(10) ).await, Err( ThesErr::ActorStoppedBeforeResponse{..} ) ));
+   assert!(matches!( addr.send( Add(10) ).await, Ok(()) ));
+
+   // Yet, our actor is still responding.
+   //
+   assert_eq!( addr.call( Add(11) ).await, Ok(11) );
+
+   Ok(())
+}
+</code></pre></pre>
+<h1><a class="header" href="#processing-messages-concurrently" id="processing-messages-concurrently">Processing messages concurrently</a></h1>
+<p>In principle an actor processes one message at a time. This restriction only makes sense however if the actor has mutable state. This avoids all synchronization problems. But what if your actor doesn't have mutable state? In that case we can process messages concurrently without any issues.</p>
+<pre><pre class="playground"><code class="language-rust">use
+{
+   thespis           :: { *                                                 } ,
+   thespis_impl      :: { *                                                 } ,
+   std               :: { error::Error                                      } ,
+   futures           :: { FutureExt, task::{ SpawnError }                   } ,
+   async_executors   :: { AsyncStd, SpawnHandle, SpawnHandleExt, JoinHandle } ,
+   async_nursery     :: { Nursery, NurseErr, Nurse, NurseExt                } ,
+};
+
+
+type DynError = Box&lt;dyn Error + Send + Sync&gt;;
+
+
+#[ derive( Actor ) ]
+//
+struct MyActor
+{
+   // We store the nursery_handle on our actor. That way the lifetime of all
+   // tasks inside the nursery is tied to the lifetime of our actor. If we drop
+   // the actor, all subtasks that are still running will be dropped.
+   //
+   // Alternatively we could have a Handler for a Stop message, which would await
+   // the nursery_handle to wait for all subtasks to finish before dropping this actor.
+   // That last one can even be combined with a timeout to limit how long we wait for
+   // subtasks to finish naturally before dropping them.
+   //
+   nursery: Box&lt; dyn Nurse&lt;()&gt; + Send &gt;,
+   _nursery_handle: JoinHandle&lt;()&gt;,
+}
+
+
+struct Ping;
+
+impl Message for Ping { type Return = Result&lt;(), NurseErr&gt;; }
+
+
+impl MyActor
+{
+   pub fn new( exec: impl SpawnHandle&lt;()&gt; + Clone + Send + 'static ) -&gt; Result&lt;Self, SpawnError&gt;
+   {
+      let (nursery, output) = Nursery::new( Box::new( exec.clone() ) );
+
+      let _nursery_handle = exec.spawn_handle( output )?;
+      let nursery         = Box::new( nursery );
+
+      Ok( Self
+      {
+          nursery        ,
+         _nursery_handle ,
+      })
+   }
+}
+
+
+impl Handler&lt;Ping&gt; for MyActor
+{
+   // For this usecase we don't use the `async_fn` macro since we don't want our entire
+   // handler to be in the returned future. We want to set some thing up first.
+   //
+   fn handle( &amp;mut self, _msg: Ping ) -&gt; Return&lt;'_, &lt;Ping as Message&gt;::Return &gt;
+   {
+      // If self had properties wrapped in Arc, we could clone them here to pass them
+      // into the future.
+      //
+      // However we can't actually pass the reference to self in if we want it
+      // to run concurrently.
+      //
+      // In theory you can have something in an Arc&lt;Mutex&gt;&gt; or atomic variables, but
+      // you really must be careful. As these run concurrently, values will change in the
+      // middle of processing which is a footgun.
+      //
+      // If we would need to update self with the result of an async operation, we can
+      // store our own address on self, clone that to pass it into the spawned task
+      // and send the result to ourselves.
+      //
+      let processing = async move
+      {
+         // do something useful.
+      };
+
+      // Processing will now run concurrently.
+      //
+      let result = self.nursery.nurse( processing );
+
+      // If spawning failed, we pass that back to caller.
+      // We are now immediately ready to process the next message even while processing is
+      // still running.
+      //
+      // We return the result of processing to the caller.
+      //
+      async move { result }.boxed()
+   }
+}
+
+
+#[async_std::main]
+//
+async fn main() -&gt; Result&lt; (), DynError &gt;
+{
+   let     actor = MyActor::new( Box::new(AsyncStd) )?;
+   let mut addr  = Addr::builder().start( actor, &amp;AsyncStd )?;
+
+   // Admittedly, this looks a bit weird. Call is fallible, and it returns a result over
+   // the NurseErr, since the handler needs to spawn and spawning is fallible.
+   //
+   addr.call( Ping ).await??;
+
+   Ok(())
+}
+</code></pre></pre>
 <h1><a class="header" href="#introduction-to-thespis_remote" id="introduction-to-thespis_remote">Introduction to thespis_remote.</a></h1>
 <p><em>Thespis_remote</em> adds support for remote actors to the thespis actor model. It follows the same rather low level approach as the rest of <em>thespis</em>. That means it provides the ability to send actor messages over one connection. The connection <em>thespis_remote</em> works over is a <code>Sink</code> and <code>Stream</code> of a given wire format. This with an encoder/decoder it works over anything that implements <code>AsyncRead</code>/<code>AsyncWrite</code>.</p>
 <p>There is no &quot;system&quot; or discovery integrated. It requires you to connect two processes by any means of your choice and provide the above interfaces to <em>thespis_remote</em>. From there <em>thespis_remote</em> provides:</p>
