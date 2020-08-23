@@ -9,5 +9,6 @@
   - [Desugar Addr::builder()](thespis_impl/desugar.md)
   - [Supervising an actor](thespis_impl/supervision.md)
   - [Processing messages concurrently](thespis_impl/concurrent.md)
+  - [Abstract the Actor type](thespis_impl/abstraction.md)
 
 - [thespis_remote](thespis_remote/introduction.md)
