@@ -42,7 +42,7 @@ async fn main() -> Result< (), Box<dyn Error> >
    let (tx, rx)  = mpsc::channel( 5 );
    let tx        = Box::new( tx.sink_map_err( |e| Box::new(e) as SinkError ) );
    let mb        = Mailbox::new( Some("HelloWorld".into()), Box::new(rx) );
-   let mut addr  = Addr::new( mb.id(), mb.name(), tx );
+   let mut addr  = mb.addr( tx );
    let actor     = MyActor;
 
    let handle = AsyncStd.spawn_handle( mb.start( actor ) )?;
@@ -51,8 +51,20 @@ async fn main() -> Result< (), Box<dyn Error> >
 
    assert_eq!( "world", dbg!(result) );
 
+   // This allows the mailbox to close. Otherwise the await below would hang.
+   //
    drop( addr );
-   handle.await;
+
+   // The JoinHandle will allow you to recover either your actor or the mailbox.
+   //
+   let actor = match handle.await
+   {
+      MailboxEnd::Actor(a) => a,
+
+      // This would happen if your actor had panicked while handling a message.
+      //
+      MailboxEnd::Mailbox(_mailbox) => unreachable!(),
+   };
 
    Ok(())
 }
@@ -87,7 +99,7 @@ impl<'a, T, Item, E> CloneSink<'a, Item, E> for T
 }
 
 
-/// A boxed error type for the sink
+/// A boxed error type for the sink.
 //
 pub type SinkError = Box< dyn std::error::Error + Send + 'static >;
 
@@ -100,7 +112,8 @@ pub type ChanSender<A> = Box< dyn CloneSink< 'static, BoxEnvelope<A>, SinkError>
 pub type ChanReceiver<A> = Box< dyn futures::Stream<Item=BoxEnvelope<A>> + Send + Unpin >;
 ```
 
-Thus the sender must implement `Sink`, `Clone`, `Unpin` and `Send` and it's error type must be `Box< dyn std::error::Error + Send + 'static >`. The receiver must be infallible and implement `Stream`, `Send` and `Unpin`. If your favorite channel implementation does not provide the `Sink` interface on it's sender, check out the `async_chanx` crate which provides some `Sink` implementations for you.
+Thus the sender must implement `Sink`, `Clone`, `Unpin` and `Send` and it's error type must be `Box< dyn std::error::Error + Send + 'static >`. The receiver must be infallible and implement `Stream`, `Send` and `Unpin`. If your favorite channel implementation does not provide the `Sink` interface on it's sender, you can often wrap them and implement the `Sink` yourself.
+
 
 ## Mailbox and Addr
 
@@ -108,12 +121,13 @@ Next we create our mailbox and address:
 
 ```rust
 let mb       = Mailbox::new( Some("HelloWorld".into()), Box::new(rx) );
-let mut addr = Addr::new( mb.id(), mb.name(), tx );
+let mut addr = mb.addr( tx );
 ```
 
 You can see that the constructors take a few parameters. The first parameter on `Mailbox::new` is an optional name. This will be used in logging to help you identify which actor is doing what. The id in the second line is similar but is just a numeric counter. Every mailbox created in the process will have a unique numeric id, but you can also name them to make it easier to understand your logs. `Addr` also exposes both the `id` and `name`. If two addresses return the same `id`, they both talk to the same mailbox and thus actor.
 
-We feed both ends of the channel to the constructors of `Mailbox` and `Addr`. You may notice that we just created both the mailbox and the address without even having instantiated an actor yet. That is because we only really need an actor when we start the mailbox. This has an interesting property. If we want our actor to have a copy of it's own address, we can just pass it along in it's constructor, since as soon as we start it we can only communicate to it through messages. It would be a bit of a pain to have to create a specific message type to give the actor it's own address.
+We feed both ends of the channel to the constructors of `Mailbox` and its `addr` method. You may notice that we just created both the mailbox and the address without even having instantiated an actor yet. That is because we only really need an actor when we start the mailbox. This has an interesting property. If we want our actor to have a copy of it's own address, we can just pass it along in it's constructor, since as soon as we start it we can only communicate to it through messages. It would be a bit of a pain to have to create a specific message type to give the actor it's own address.
+
 
 ## Starting the mailbox
 
@@ -125,6 +139,7 @@ let handle = AsyncStd.spawn_handle( mb.start( actor ) )?;
 Next we create an actor and pass it to `Mailbox::start`. This method returns a future that you can spawn however way you like on the executor of your choice. `Mailbox` has a a few convenience methods as well which allow you to pass the executor by reference which avoids having to import the spawn traits as well as local versions for spawning actors that aren't `Send`. Check the API docs.
 
 We use the `AsyncStd` wrapper from _async_executors_ here. One essential difference with using `async-std` directly is that the joinhandle this returns will cancel the future when you drop it, which is a way you can stop an actor. The recommended way is to drop all addresses to the actor.
+
 
 ## Stopping the actor
 

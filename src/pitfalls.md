@@ -7,11 +7,13 @@ The actor model is a very convenient programming paradigm. It automatically solv
 
 The original actor model is very simple. If you want to have a request-response type message, you had to send your own address along with the message so the recipient knows how to respond to you. Thanks to rust's futures, we can easily create a request-response and thespis makes this convenient for you with `Address::call`. However, if you await a response whilst processing a message, a deadlock can arise.
 
-As actors only process one message at a time, if you have a cyclic dependency, your program can deadlock. That is if have actor A depending on actor B to to process it's message, but in order to process A's request B also needs to call back A, both actors will deadlock, as they are waiting on each other and will no longer process any messages ever after.
+As actors only process one message at a time. If you have a cyclic dependency, your program can deadlock. That is if actor A depends on actor B to to process it's message, but in order to process A's request B also needs to call back A, both actors will deadlock, as they are waiting on each other and will no longer process any messages ever after.
 
 You can run into this problem through intermediate actors, so A and B might not be calling each other directly.
 
 You can also run into this problem with a single actor when using bounded channels. If the mailbox of the actor is currently full and it sends itself a message, it will deadlock. You should generally spawn such a send to avoid blocking processing of the current message.
+
+Another deadlock issue can arise when an actor is the gatekeeper of a connection (to the network or other components). That is if the mailbox of one actor accumulates both incoming and outgoing messages. If incoming messages saturate the system, and fill up the gatekeeper's mailbox, no responses can flow out. Hence no place is made for new incoming messages and everything blocks. You might want to read up on this issue [in this article](https://elizarov.medium.com/deadlocks-in-non-hierarchical-csp-e5910d137cc) which has some nice diagrams to explain the problem and [on the trio forum](https://trio.discourse.group/t/sizing-the-channel-deadlock-freedom-vs-back-pressure).
 
 
 ## 2. Memory consumption
@@ -47,6 +49,12 @@ Note that `send` also blocks the task, but only until the message has been deliv
 
 ## 5. Backpressure
 
+In any concurrent system special care always must be taken when it comes to back pressure. If your system get's flooded with incoming messages faster than they can be processed, you can have unbounded memory consumption (unbounded channels), deadlocks (bounded channels, see above) as well as CPU exhaustion. You must have a conscious plan for how backpressure is provided to slow down incoming messages. Sometimes bounded channels can be a solution if you are careful not to deadlock. Other times you will need to build a custom back pressure mechanism to to limit the number of in flight requests (this is what _thespis_remote_ does).
+
+You might also be able to wrap the channel you pass to _thespis_impl_ with something like [_stream_throttle_](https://lib.rs/crates/stream_throttle). I haven't tried it out yet.
+
+[Handling overload](https://ferd.ca/handling-overload.html) is an interesting article from the Erlang world examining this rather difficult problem.
+
 
 ## 6. Actor Lifetime
 
@@ -54,6 +62,6 @@ Thespis follows a model very similar to the Rust memory model. The mailbox for a
 
 The initial ambition was to say an address is always valid, and thus sending can conveniently be infallible. In practice this doesn't work, since an actor might panic while processing a message. When using remote actors, the network or the remote process might go down and on top of that, most channel implementations have a fallible send.
 
-I kept this lifetime management, because usually having addresses around to actors that are no longer running is a sign of sloppy coding. But it requires extra discipline and especially be aware of actors that have their own address, or 2 actors that have addresses to each other.
+I kept this lifetime management, because usually having addresses around to actors that are no longer running is a sign of sloppy coding. _thespis_impl_ has support for a weak address, which will not keep the mailbox alive. This is particularly handy for situations like an actor which needs its own address, but shouldn't keep itself alive. Also be wary of two actors which have each other's address.
 
-One way to sidestep this is to pull the plug. That is if you cancel the future running the mailbox, well it's terminated, however this is not recommended. If you really want an actor to stop it's own mailbox, regardless of other components that might still want to use it, you can let it spawn itself so it can have a JoinHandle that it can use to abort the mailbox.
+One way to sidestep this is to pull the plug. That is if you cancel the future running the mailbox, well it's terminated, however this is not recommended. If you really want an actor to stop it's own mailbox, regardless of other components that might still want to use it, you can let it spawn itself so it can have a `JoinHandle` that it can use to abort the mailbox.

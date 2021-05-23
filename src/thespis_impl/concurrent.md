@@ -2,7 +2,7 @@
 
 In principle an actor processes one message at a time. This restriction only makes sense however if the actor has mutable state. This avoids all synchronization problems. But what if your actor doesn't have mutable state? In that case we can process messages concurrently without any issues.
 
-The following example shows how you can tie the lifetime of the sub-tasks to the lifetime of the actor by using a nursery:
+The following example also shows how you can tie the lifetime of the sub-tasks to the lifetime of the actor by using a nursery:
 
 ```rust
 use
