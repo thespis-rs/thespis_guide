@@ -11,6 +11,7 @@
   - [Supervising an actor](thespis_impl/supervision.md)
   - [Processing messages concurrently](thespis_impl/concurrent.md)
   - [Abstract the Actor type](thespis_impl/abstraction.md)
+  - [Debugging](thespis_impl/debugging.md)
 
 - [thespis_remote](thespis_remote/introduction.md)
 	- [ServiceMap](thespis_remote/service_map.md)
