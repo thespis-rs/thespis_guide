@@ -26,7 +26,9 @@
         <link rel="stylesheet" href="../css/variables.css">
         <link rel="stylesheet" href="../css/general.css">
         <link rel="stylesheet" href="../css/chrome.css">
+        
         <link rel="stylesheet" href="../css/print.css" media="print">
+        
 
         <!-- Fonts -->
         <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
@@ -95,7 +97,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../actor_model.html"><strong aria-hidden="true">2.</strong> What is the actor model?</a></li><li class="chapter-item expanded "><a href="../what_is_thespis.html"><strong aria-hidden="true">3.</strong> What is thespis?</a></li><li class="chapter-item expanded "><a href="../pitfalls.html"><strong aria-hidden="true">4.</strong> Pitfalls Checklist</a></li><li class="chapter-item expanded "><a href="../thespis_impl/thespis_impl.html"><strong aria-hidden="true">5.</strong> thespis_impl</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../thespis_impl/desugar.html"><strong aria-hidden="true">5.1.</strong> Desugar Addr::builder()</a></li><li class="chapter-item expanded "><a href="../thespis_impl/supervision.html"><strong aria-hidden="true">5.2.</strong> Supervising an actor</a></li><li class="chapter-item expanded "><a href="../thespis_impl/concurrent.html"><strong aria-hidden="true">5.3.</strong> Processing messages concurrently</a></li><li class="chapter-item expanded "><a href="../thespis_impl/abstraction.html"><strong aria-hidden="true">5.4.</strong> Abstract the Actor type</a></li></ol></li><li class="chapter-item expanded "><a href="../thespis_remote/introduction.html" class="active"><strong aria-hidden="true">6.</strong> thespis_remote</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../actor_model.html"><strong aria-hidden="true">2.</strong> What is the actor model?</a></li><li class="chapter-item expanded "><a href="../what_is_thespis.html"><strong aria-hidden="true">3.</strong> What is thespis?</a></li><li class="chapter-item expanded "><a href="../pitfalls.html"><strong aria-hidden="true">4.</strong> Pitfalls Checklist</a></li><li class="chapter-item expanded "><a href="../thespis_impl/local.html"><strong aria-hidden="true">5.</strong> !Send Actors</a></li><li class="chapter-item expanded "><a href="../thespis_impl/thespis_impl.html"><strong aria-hidden="true">6.</strong> thespis_impl</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../thespis_impl/desugar.html"><strong aria-hidden="true">6.1.</strong> Desugar Addr::builder()</a></li><li class="chapter-item expanded "><a href="../thespis_impl/supervision.html"><strong aria-hidden="true">6.2.</strong> Supervising an actor</a></li><li class="chapter-item expanded "><a href="../thespis_impl/concurrent.html"><strong aria-hidden="true">6.3.</strong> Processing messages concurrently</a></li><li class="chapter-item expanded "><a href="../thespis_impl/abstraction.html"><strong aria-hidden="true">6.4.</strong> Abstract the Actor type</a></li><li class="chapter-item expanded "><a href="../thespis_impl/debugging.html"><strong aria-hidden="true">6.5.</strong> Debugging</a></li></ol></li><li class="chapter-item expanded "><a href="../thespis_remote/introduction.html" class="active"><strong aria-hidden="true">7.</strong> thespis_remote</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../thespis_remote/service_map.html"><strong aria-hidden="true">7.1.</strong> ServiceMap</a></li><li class="chapter-item expanded "><a href="../thespis_remote/peer.html"><strong aria-hidden="true">7.2.</strong> Peer</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -130,17 +132,21 @@
                     <h1 class="menu-title">Thespis User Guide</h1>
 
                     <div class="right-buttons">
+                        
                         <a href="../print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
                         </a>
                         
+                        
+                        
+
                     </div>
                 </div>
 
                 
                 <div id="search-wrapper" class="hidden">
                     <form id="searchbar-outer" class="searchbar-outer">
-                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
                     </form>
                     <div id="searchresults-outer" class="searchresults-outer hidden">
                         <div id="searchresults-header" class="searchresults-header"></div>
@@ -161,21 +167,23 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#introduction-to-thespis_remote" id="introduction-to-thespis_remote">Introduction to thespis_remote.</a></h1>
-<p><em>Thespis_remote</em> adds support for remote actors to the thespis actor model. It follows the same rather low level approach as the rest of <em>thespis</em>. That means it provides the ability to send actor messages over one connection. The connection <em>thespis_remote</em> works over is a <code>Sink</code> and <code>Stream</code> of a given wire format. This with an encoder/decoder it works over anything that implements <code>AsyncRead</code>/<code>AsyncWrite</code>.</p>
-<p>There is no &quot;system&quot; or discovery integrated. It requires you to connect two processes by any means of your choice and provide the above interfaces to <em>thespis_remote</em>. From there <em>thespis_remote</em> provides:</p>
+                        <h1 id="introduction-to-thespis_remote"><a class="header" href="#introduction-to-thespis_remote">Introduction to thespis_remote.</a></h1>
+<p><em>Thespis_remote</em> adds support for remote actors to the thespis actor model. It follows the same rather low level approach as the rest of <em>thespis</em>. That means it provides the ability to send actor messages over one connection. The connection <em>thespis_remote</em> works over is a <code>Sink</code> and <code>Stream</code> of a given wire format. The wire format has an encoder/decoder so works over anything that implements <code>AsyncRead</code>/<code>AsyncWrite</code>.</p>
+<p>There is no &quot;system&quot; or service discovery integrated. It requires you to connect two processes by any means of your choice and provide the above interfaces to <em>thespis_remote</em>. From there <em>thespis_remote</em> provides:</p>
 <ul>
-<li><code>RemoteAddr</code> which allows you to send messages as if you were sending to an actor in the same process.</li>
+<li><code>RemoteAddr</code> which allows you to send messages as if you were sending to an actor in the same process (only difference, <code>send</code> does not guarantee in order delivery).</li>
 <li><code>ServiceMap</code>, a trait and provided reference impl that knows how to deserialize your actor messages and dispatch them to the right actor. Note that you can only set one actor per message type per service map, so you are actually sending to a remote process rather than to an individual actor in that process. However you can easily wrap your message with an actor id and provide more precise delivery if you want.</li>
 <li><code>WireFormat</code>, a trait and reference impl for the actual wire format used.</li>
-<li><code>Peer</code>, an actor that manages a connection endpoint. You provide it with a service map to &quot;serve&quot; over the connection and you pass it when you create <code>RemoteAddr</code> stating that you know that the other side of the connection managed by this <code>Peer</code> exposes the services you</li>
+<li><code>Peer</code>, an actor that manages a connection endpoint. You provide it with a service map to &quot;serve&quot; over the connection and for sending messages, you pass it's address to the constructor of <code>RemoteAddr</code>, implying that you know that the other side of the connection managed by this <code>Peer</code> exposes these services. This last part is the only thing we cannot guarantee in the type system, as the compiler does not know about the process on the other end of your connection.</li>
 </ul>
 <p>These are the four core components of the library.</p>
 <p><em>thespis_remote</em> also provides relaying of messages. Further some features are included to deal with back pressure and to make it resistant to attacks like DOS and slow loris.</p>
 <p>Apart from this guide you can also consult the <a href="https://docs.rs/thespis_remote">API documentation</a> and the <a href="https://github.com/thespis-rs/thespis_remote/tree/master/examples">examples</a>.</p>
-<h1><a class="header" href="#design" id="design">Design</a></h1>
-<p>You might feel cheated that you can't address individual actors on a remote process. There are good reasons for this however and nothing stops you from implementing this functionality on top of <em>thespis_remote</em>. In <em>thespis</em> everything is as much as possible statically type checked. By considering a process that exposes it's possibility to receive messages of certain types, we adhere to a public interface like a contract. It allows a remote process to statically create addresses to send us messages, rather than having to send over addresses at runtime.</p>
-<p>Actors can accept several types of messages, but some of those might not be meant for external use. If we were to expose an address to this actor as is, all of it's interface would be remotely exposed. We would also need to compile in the actor type in the remote process, where with the current design only message types need to be shared between the two processes.</p>
+<h1 id="scope"><a class="header" href="#scope">Scope</a></h1>
+<p>The scope of <em>thespis_remote</em> is specifically as described above. On the low end of the scope this means there is no management of your connection. When the connection fails, <code>Peer</code> will generate an event for you to react on. You have to re-connect and re-setup your <code>Peer</code> and service map. This limitation is necessary to keep the scope of the project reasonable as many different types of connections can be used. You can obviously write your own wrapper that provides automatic reconnect and maybe in the future something like that will be provided by the thespis project, but it won't be in <em>thespis_remote</em>.</p>
+<p>On the high end of the scope, <em>thespis_remote</em> does not handle any application logic. Most prominently authentication/authorization comes to mind. What if a user has to authenticate before being allowed to send certain messages to your service. It generally comes down to 2 key components: prevent MITM by end to end encryption (do this on the connection level) and sending along some proof of identity (think cookie in HTTP land). <em>thespis_remote</em> does not have any instrumentation for this and it will be up to you to handle this in your message types.</p>
+<p>You might feel cheated that you can't address individual actors on a remote process. There are good reasons for this however and nothing stops you from implementing individual actor addressing on top of <em>thespis_remote</em>. In <em>thespis</em> everything is as much as possible statically type checked. By considering a process that exposes it's possibility to receive messages of certain types, we adhere to a public interface like a contract. It allows a remote process to statically create addresses to send us messages, rather than having to send over addresses at runtime.</p>
+<p>Actors can accept several types of messages, but some of those might not be meant for external use. If we were to expose an address to a specific actor type as is, all of it's interface would be remotely exposed. We would also need to compile in the actor type in the remote process, where with the current design only message types need to be shared between the two processes.</p>
 <p><em>thespis_remote</em> is minimal in the sense that it creates the fundamental building block for remote actor communication. Systems, discovery and individual actor addressing can all be implemented on top of it.</p>
 <p>Several components of the library can easily be customized. The traits <code>WireFormat</code> and <code>ServiceMap</code> allow you to create your own specialized implementations if desired.</p>
 
@@ -184,11 +192,15 @@
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                         
-                            <a rel="prev" href="../thespis_impl/abstraction.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../thespis_impl/debugging.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
                         
 
+                        
+                            <a rel="next" href="../thespis_remote/service_map.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
                         
 
                         <div style="clear: both"></div>
@@ -198,11 +210,15 @@
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
-                    <a rel="prev" href="../thespis_impl/abstraction.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../thespis_impl/debugging.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 
 
+                
+                    <a rel="next" href="../thespis_remote/service_map.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
                 
             </nav>
 

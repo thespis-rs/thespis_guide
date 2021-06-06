@@ -26,7 +26,9 @@
         <link rel="stylesheet" href="../css/variables.css">
         <link rel="stylesheet" href="../css/general.css">
         <link rel="stylesheet" href="../css/chrome.css">
+        
         <link rel="stylesheet" href="../css/print.css" media="print">
+        
 
         <!-- Fonts -->
         <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
@@ -95,7 +97,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../actor_model.html"><strong aria-hidden="true">2.</strong> What is the actor model?</a></li><li class="chapter-item expanded "><a href="../what_is_thespis.html"><strong aria-hidden="true">3.</strong> What is thespis?</a></li><li class="chapter-item expanded "><a href="../pitfalls.html"><strong aria-hidden="true">4.</strong> Pitfalls Checklist</a></li><li class="chapter-item expanded "><a href="../thespis_impl/thespis_impl.html" class="active"><strong aria-hidden="true">5.</strong> thespis_impl</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../thespis_impl/desugar.html"><strong aria-hidden="true">5.1.</strong> Desugar Addr::builder()</a></li><li class="chapter-item expanded "><a href="../thespis_impl/supervision.html"><strong aria-hidden="true">5.2.</strong> Supervising an actor</a></li><li class="chapter-item expanded "><a href="../thespis_impl/concurrent.html"><strong aria-hidden="true">5.3.</strong> Processing messages concurrently</a></li><li class="chapter-item expanded "><a href="../thespis_impl/abstraction.html"><strong aria-hidden="true">5.4.</strong> Abstract the Actor type</a></li></ol></li><li class="chapter-item expanded "><a href="../thespis_remote/introduction.html"><strong aria-hidden="true">6.</strong> thespis_remote</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../actor_model.html"><strong aria-hidden="true">2.</strong> What is the actor model?</a></li><li class="chapter-item expanded "><a href="../what_is_thespis.html"><strong aria-hidden="true">3.</strong> What is thespis?</a></li><li class="chapter-item expanded "><a href="../pitfalls.html"><strong aria-hidden="true">4.</strong> Pitfalls Checklist</a></li><li class="chapter-item expanded "><a href="../thespis_impl/local.html"><strong aria-hidden="true">5.</strong> !Send Actors</a></li><li class="chapter-item expanded "><a href="../thespis_impl/thespis_impl.html" class="active"><strong aria-hidden="true">6.</strong> thespis_impl</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../thespis_impl/desugar.html"><strong aria-hidden="true">6.1.</strong> Desugar Addr::builder()</a></li><li class="chapter-item expanded "><a href="../thespis_impl/supervision.html"><strong aria-hidden="true">6.2.</strong> Supervising an actor</a></li><li class="chapter-item expanded "><a href="../thespis_impl/concurrent.html"><strong aria-hidden="true">6.3.</strong> Processing messages concurrently</a></li><li class="chapter-item expanded "><a href="../thespis_impl/abstraction.html"><strong aria-hidden="true">6.4.</strong> Abstract the Actor type</a></li><li class="chapter-item expanded "><a href="../thespis_impl/debugging.html"><strong aria-hidden="true">6.5.</strong> Debugging</a></li></ol></li><li class="chapter-item expanded "><a href="../thespis_remote/introduction.html"><strong aria-hidden="true">7.</strong> thespis_remote</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../thespis_remote/service_map.html"><strong aria-hidden="true">7.1.</strong> ServiceMap</a></li><li class="chapter-item expanded "><a href="../thespis_remote/peer.html"><strong aria-hidden="true">7.2.</strong> Peer</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -130,17 +132,21 @@
                     <h1 class="menu-title">Thespis User Guide</h1>
 
                     <div class="right-buttons">
+                        
                         <a href="../print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
                         </a>
                         
+                        
+                        
+
                     </div>
                 </div>
 
                 
                 <div id="search-wrapper" class="hidden">
                     <form id="searchbar-outer" class="searchbar-outer">
-                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
                     </form>
                     <div id="searchresults-outer" class="searchresults-outer hidden">
                         <div id="searchresults-header" class="searchresults-header"></div>
@@ -161,8 +167,8 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#thespis_impl" id="thespis_impl">thespis_impl</a></h1>
-<p>This is the reference implementation. This chapter goes over it's features and provides you with example code. The most basic example, hello world:</p>
+                        <h1 id="thespis_impl"><a class="header" href="#thespis_impl">thespis_impl</a></h1>
+<p>This is the reference implementation for the interface defined in the <em>thespis</em> crate. This chapter goes over it's features and provides you with example code. The most basic example, hello world:</p>
 <pre><pre class="playground"><code class="language-rust">use
 {
    thespis         :: { *            } ,
@@ -198,6 +204,11 @@ impl Handler&lt; Hello &gt; for MyActor
 //
 async fn main() -&gt; Result&lt; (), Box&lt;dyn Error&gt; &gt;
 {
+   // .start here spawns your mailbox/actor immediately on the given executor and
+   // detaches the joinhandle. You can also use the `spawn..` functions on the builder
+   // in order to get a JoinHandle which you should await as it will drop the mailbox
+   // when dropped.
+   //
    let mut addr = Addr::builder().start( MyActor, &amp;AsyncStd )?;
 
    let result = addr.call( Hello( &quot;hello&quot;.into() ) ).await?;
@@ -207,7 +218,7 @@ async fn main() -&gt; Result&lt; (), Box&lt;dyn Error&gt; &gt;
    Ok(())
 }
 </code></pre></pre>
-<h2><a class="header" href="#discussion" id="discussion">Discussion</a></h2>
+<h2 id="discussion"><a class="header" href="#discussion">Discussion</a></h2>
 <p>Let's quickly take a tour of the anatomy of this simple program:</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
@@ -217,7 +228,7 @@ async fn main() -&gt; Result&lt; (), Box&lt;dyn Error&gt; &gt;
 struct MyActor;
 <span class="boring">}
 </span></code></pre></pre>
-<p><code>Actor</code> is a trait defined in the <em>thespis</em> crate. It has no required methods, so you can easily derive it. <code>MyActor</code> here is what generally holds the (mutable) state of your actor. In this simple example there is no state. The mailbox will take ownership of this and after that you can only communicate with it by sending messages through the address you get back. Once you give it to the mailbox you can no longer call methods on it.</p>
+<p><code>Actor</code> is a trait defined in the <em>thespis</em> crate. It has no required methods, so you can easily derive it. <code>MyActor</code> here is what generally holds the (mutable) state of your actor. In this simple example there is no state, but otherwise you could manipulated it from within the implementation of <code>Handler&lt;T&gt;</code>. The mailbox will take ownership of your actor and after that you can only communicate with it by sending messages through the address you get back. Once you give it to the mailbox you can no longer call methods on it.</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
@@ -229,8 +240,8 @@ impl Message for Hello
 }
 <span class="boring">}
 </span></code></pre></pre>
-<p><code>Hello</code> is a message type. The type system will guarantee that you can never send a message type to an actor unless it implements <code>Handler</code> for that type and the type implements the <code>Message</code> trait. As you will have to implement this trait for your message types, you will have to wrap types that are not defined in your crate in order to use them as a message. Here we wrap <code>String</code>.</p>
-<p>The associated type is the return type of the handler. When using <code>Addr::call</code> your actor can return a value to the caller, making it easy to implement request-response type communication, mimicking a method call. Sending a message to an actor is always asynchronous.</p>
+<p><code>Hello</code> is a message type. The type system will guarantee that you can never send a message type to an actor unless it implements <code>Handler</code> for that type and the type implements the <code>Message</code> trait. As you will have to implement this trait for your message types, you will have to wrap types that are not defined in your crate in order to use them as a message. Here we wrap <code>String</code>. If your handler might panic, please make sure the message type is <code>UnwindSafe</code>, as the mailbox will call <code>catch_unwind</code> on the handler method. This allows us to elegantly allow supervising of actors. All together it is recommended that your handlers don't panic, rather return a <code>Result</code> if they need to be fallible. Nevertheless, messages in the actor model are meant to be data and not have any shared resources like locks or references in them.</p>
+<p>The associated type is the return type of the handler. When using <code>Addr::call</code> your actor can return a value to the caller, making it easy to implement request-response type communication, mimicking a method call. Sending a message to an actor is always asynchronous. Note: we could also have written <code>-&gt; &lt;Hello as Message&gt;::Return</code> as the return type here. In any case, it needs to be the same type.</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
@@ -243,7 +254,7 @@ impl Message for Hello
 }
 <span class="boring">}
 </span></code></pre></pre>
-<p>Here we define that <code>MyActor</code> can process messages of type <code>Hello</code>. The body of the function does the actual processing. As you can see it receives a <code>&amp;mut self</code>, even though we know that all messages are sent asynchronously. This is the main advantage of the actor model. Even though any place in your code that has this actor's address can easily send messages, you never need thread sync like locks on your data. Only this actor can access it's own state directly and the only way to communicate with it is through sending messages. Further more the mailbox will make the actor process one message at a time, so there is never shared mutual access to the state.</p>
+<p>Here we define that <code>MyActor</code> can process messages of type <code>Hello</code>. The body of the function does the actual processing. As you can see it receives a <code>&amp;mut self</code>, even though we know that all messages are sent asynchronously. This is the main advantage of the actor model. Even though any place in your code that has this actor's address can easily send messages, you never need thread sync like locks or the infamous <code>Rc&lt;Refcell&gt;</code> on your data. Only this actor can access it's own state directly and the only way to communicate with it is through sending messages. Further more the mailbox will make the actor process one message at a time, so there is never shared access to the mutual state.</p>
 <p>Using plain Object Oriented Programming in async Rust with methods that access state is very difficult, since as soon as you spawn any task, that task cannot hold any references to anything outside of it and to make matters worse, you shouldn't hold a mutex across an await point. The actor model sidesteps these problems, as any code that needs to communicate with an actor only needs the address, not a reference to the actor itself. <code>Addr</code> implements clone, so you can have many places of your program talk to the actor.</p>
 <p>The <code>async_fn</code> macro deals with the fact that Rust doesn't support async trait methods at the moment. It does this in a very similar way as the <em>async-trait</em> crate, but it outputs much simpler code, making it compatible with a hand written version of this method, which was not possible with <em>async-trait</em>.</p>
 <p>A handwritten version would look like:</p>
@@ -281,7 +292,7 @@ pub type Return&lt;'a, R&gt; = Pin&lt;Box&lt; dyn Future&lt;Output = R&gt; + 'a 
 <p>We use a convenience builder to create the address we will use to send messages to our actor, and tell it to
 generate a default mailbox for it and spawn it on the provided executor.</p>
 <p>The <code>AsyncStd</code> type comes from the <em>async_executor</em> crate which provides a uniform interface for executors,
-allowing us to be executor agnostic. We could just as well have given it a <code>tokio</code> executor or one from the <code>futures</code> crate.</p>
+allowing us to be executor agnostic. We could just as well have given it a <em>tokio</em> executor or one from the <em>futures</em> crate, or <em>wasm-bindgen</em> on Wasm.</p>
 <p>Note that this function takes our actor by value as we shouldn't access it anymore directly once it starts processing messages.</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
@@ -292,13 +303,33 @@ allowing us to be executor agnostic. We could just as well have given it a <code
 <p>We use <code>Address::call</code> to send a message to our actor. This method will return to us a future that will resolve to the answer our handler returns. Note that <code>Addr</code> also implements <code>futures_sink::Sink</code>. You can use the combinators from the futures crate to forward an entire stream into the address, as long as the actor implements <code>Handler</code> for the type the stream produces. The <code>send</code> method from the <code>Sink</code> trait will drop the returned value and will return to us as soon as the message is delivered to the mailbox, without waiting for the actor to process the message.</p>
 <p>Thus you can also use the <code>call</code> method even if you don't want to return any value to be sure that the message has been processed, where as <code>send</code> is more like throwing a message in a bottle. You will still get back pressure from <code>send</code> as it will block when the channel between the <code>Addr</code> and the mailbox is full (as long as it's not an unbounded channel that is).</p>
 <p>In the next chapter we will take a look at desugaring the builder and manually create our mailbox and address.</p>
+<h2 id="weak-and-strong-addresses"><a class="header" href="#weak-and-strong-addresses">Weak and Strong addresses.</a></h2>
+<p>It doesn't figure in the basic example, but the mailbox of the actor stops when all addresses to it are dropped. The <code>JoinHandle</code> from the executor will return your actor to you if you want to re-use it later. When the mailbox is stopped because your actor panicked, you will retrieve the mailbox instead and you can instantiate a new actor and spawn it on the same mailbox, so all addresses remain valid. This is further elaborated in the chapter about supervision.</p>
+<p><em>Thespis_impl</em> also has weak addresses. These addresses don't keep the mailbox alive. It is handy when for example the actor needs it's own address. In this case you don't necessarily want it to keep itself alive. Creating a weak address is simple:</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Does not consume addr, hence it's not called downgrade.
+//
+let weak_addr = addr.weak();
+
+// You can create a strong address from a weak one as long as the mailbox is still open.
+// If all strong addresses were already dropped at this point, you will get an error instead.
+//
+let strong = match weak.strong()
+{
+   Ok(addr) =&gt; addr,
+   Err(e)   =&gt; {} // -&gt; ThesErr::MailboxClosed.
+};
+<span class="boring">}
+</span></code></pre></pre>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                         
-                            <a rel="prev" href="../pitfalls.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../thespis_impl/local.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
                         
@@ -316,7 +347,7 @@ allowing us to be executor agnostic. We could just as well have given it a <code
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
-                    <a rel="prev" href="../pitfalls.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../thespis_impl/local.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 

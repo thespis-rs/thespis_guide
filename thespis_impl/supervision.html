@@ -26,7 +26,9 @@
         <link rel="stylesheet" href="../css/variables.css">
         <link rel="stylesheet" href="../css/general.css">
         <link rel="stylesheet" href="../css/chrome.css">
+        
         <link rel="stylesheet" href="../css/print.css" media="print">
+        
 
         <!-- Fonts -->
         <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
@@ -95,7 +97,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../actor_model.html"><strong aria-hidden="true">2.</strong> What is the actor model?</a></li><li class="chapter-item expanded "><a href="../what_is_thespis.html"><strong aria-hidden="true">3.</strong> What is thespis?</a></li><li class="chapter-item expanded "><a href="../pitfalls.html"><strong aria-hidden="true">4.</strong> Pitfalls Checklist</a></li><li class="chapter-item expanded "><a href="../thespis_impl/thespis_impl.html"><strong aria-hidden="true">5.</strong> thespis_impl</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../thespis_impl/desugar.html"><strong aria-hidden="true">5.1.</strong> Desugar Addr::builder()</a></li><li class="chapter-item expanded "><a href="../thespis_impl/supervision.html" class="active"><strong aria-hidden="true">5.2.</strong> Supervising an actor</a></li><li class="chapter-item expanded "><a href="../thespis_impl/concurrent.html"><strong aria-hidden="true">5.3.</strong> Processing messages concurrently</a></li><li class="chapter-item expanded "><a href="../thespis_impl/abstraction.html"><strong aria-hidden="true">5.4.</strong> Abstract the Actor type</a></li></ol></li><li class="chapter-item expanded "><a href="../thespis_remote/introduction.html"><strong aria-hidden="true">6.</strong> thespis_remote</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../actor_model.html"><strong aria-hidden="true">2.</strong> What is the actor model?</a></li><li class="chapter-item expanded "><a href="../what_is_thespis.html"><strong aria-hidden="true">3.</strong> What is thespis?</a></li><li class="chapter-item expanded "><a href="../pitfalls.html"><strong aria-hidden="true">4.</strong> Pitfalls Checklist</a></li><li class="chapter-item expanded "><a href="../thespis_impl/local.html"><strong aria-hidden="true">5.</strong> !Send Actors</a></li><li class="chapter-item expanded "><a href="../thespis_impl/thespis_impl.html"><strong aria-hidden="true">6.</strong> thespis_impl</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../thespis_impl/desugar.html"><strong aria-hidden="true">6.1.</strong> Desugar Addr::builder()</a></li><li class="chapter-item expanded "><a href="../thespis_impl/supervision.html" class="active"><strong aria-hidden="true">6.2.</strong> Supervising an actor</a></li><li class="chapter-item expanded "><a href="../thespis_impl/concurrent.html"><strong aria-hidden="true">6.3.</strong> Processing messages concurrently</a></li><li class="chapter-item expanded "><a href="../thespis_impl/abstraction.html"><strong aria-hidden="true">6.4.</strong> Abstract the Actor type</a></li><li class="chapter-item expanded "><a href="../thespis_impl/debugging.html"><strong aria-hidden="true">6.5.</strong> Debugging</a></li></ol></li><li class="chapter-item expanded "><a href="../thespis_remote/introduction.html"><strong aria-hidden="true">7.</strong> thespis_remote</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../thespis_remote/service_map.html"><strong aria-hidden="true">7.1.</strong> ServiceMap</a></li><li class="chapter-item expanded "><a href="../thespis_remote/peer.html"><strong aria-hidden="true">7.2.</strong> Peer</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -130,17 +132,21 @@
                     <h1 class="menu-title">Thespis User Guide</h1>
 
                     <div class="right-buttons">
+                        
                         <a href="../print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
                         </a>
                         
+                        
+                        
+
                     </div>
                 </div>
 
                 
                 <div id="search-wrapper" class="hidden">
                     <form id="searchbar-outer" class="searchbar-outer">
-                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
                     </form>
                     <div id="searchresults-outer" class="searchresults-outer hidden">
                         <div id="searchresults-header" class="searchresults-header"></div>
@@ -161,7 +167,7 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#supervising-an-actor" id="supervising-an-actor">Supervising an actor</a></h1>
+                        <h1 id="supervising-an-actor"><a class="header" href="#supervising-an-actor">Supervising an actor</a></h1>
 <p>A common pattern in actor software is supervision. The idea is to monitor a hierarchy of actors and if any one crashes, it's supervisor will spawn a new one to replace it. This is a strategy for more robust software. In terms of Rust actors, I would rather suggest you try to make your handlers panic free, and let them return a <code>Result</code> that you can handle if they are fallible, but that is not always possible and you can use the supervision pattern with thespis.</p>
 <p>The following example is relatively straightforward. The main feature allowing supervising in thespis is that the mailbox future returns the mailbox to you if the actor panics while processing a message. This means that you can just instantiate a new actor and spawn the mailbox again and it will be fully operational. All addresses to it will just remain valid.</p>
 <p><strong>Warning</strong>: This does mean that mailbox uses catch unwind on your handlers. That means they should be unwindsafe, but as you shouldn't be using shared mutability anyway this should already be the case.</p>
@@ -218,7 +224,7 @@ struct Supervisor
 //
 struct Supervise&lt;A: Actor&gt;
 {
-   mailbox : Option&lt; JoinHandle&lt;Option&lt;Mailbox&lt;A&gt;&gt;&gt; &gt; ,
+   mailbox : Option&lt; JoinHandle&lt;MailboxEnd&lt;A&gt;&gt;&gt; &gt; ,
 
    // A closure that knows how to instantiate the supervised actor.
    //
@@ -257,9 +263,9 @@ impl&lt;A: Actor + Send&gt; Handler&lt; Supervise&lt;A&gt; &gt; for Supervisor
          // This is where the magic happens. Every time the handle resolves, we spawn again
          // and replace it with a new handle.
          //
-         // When this returns None, it means the actor has stopped naturally and we don't respawn it.
+         // When this returns MailboxEnd::Actor, it means the actor has stopped naturally and we don't respawn it.
          //
-         while let Some(mb) = mb_handle.await
+         while let MailboxEnd::Mailbox(mb) = mb_handle.await
          {
             mb_handle = mb.start_handle( (actor.create)(), &amp;AsyncStd ).unwrap();
          }

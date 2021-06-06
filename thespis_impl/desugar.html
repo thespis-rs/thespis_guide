@@ -26,7 +26,9 @@
         <link rel="stylesheet" href="../css/variables.css">
         <link rel="stylesheet" href="../css/general.css">
         <link rel="stylesheet" href="../css/chrome.css">
+        
         <link rel="stylesheet" href="../css/print.css" media="print">
+        
 
         <!-- Fonts -->
         <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
@@ -95,7 +97,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../actor_model.html"><strong aria-hidden="true">2.</strong> What is the actor model?</a></li><li class="chapter-item expanded "><a href="../what_is_thespis.html"><strong aria-hidden="true">3.</strong> What is thespis?</a></li><li class="chapter-item expanded "><a href="../pitfalls.html"><strong aria-hidden="true">4.</strong> Pitfalls Checklist</a></li><li class="chapter-item expanded "><a href="../thespis_impl/thespis_impl.html"><strong aria-hidden="true">5.</strong> thespis_impl</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../thespis_impl/desugar.html" class="active"><strong aria-hidden="true">5.1.</strong> Desugar Addr::builder()</a></li><li class="chapter-item expanded "><a href="../thespis_impl/supervision.html"><strong aria-hidden="true">5.2.</strong> Supervising an actor</a></li><li class="chapter-item expanded "><a href="../thespis_impl/concurrent.html"><strong aria-hidden="true">5.3.</strong> Processing messages concurrently</a></li><li class="chapter-item expanded "><a href="../thespis_impl/abstraction.html"><strong aria-hidden="true">5.4.</strong> Abstract the Actor type</a></li></ol></li><li class="chapter-item expanded "><a href="../thespis_remote/introduction.html"><strong aria-hidden="true">6.</strong> thespis_remote</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../actor_model.html"><strong aria-hidden="true">2.</strong> What is the actor model?</a></li><li class="chapter-item expanded "><a href="../what_is_thespis.html"><strong aria-hidden="true">3.</strong> What is thespis?</a></li><li class="chapter-item expanded "><a href="../pitfalls.html"><strong aria-hidden="true">4.</strong> Pitfalls Checklist</a></li><li class="chapter-item expanded "><a href="../thespis_impl/local.html"><strong aria-hidden="true">5.</strong> !Send Actors</a></li><li class="chapter-item expanded "><a href="../thespis_impl/thespis_impl.html"><strong aria-hidden="true">6.</strong> thespis_impl</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../thespis_impl/desugar.html" class="active"><strong aria-hidden="true">6.1.</strong> Desugar Addr::builder()</a></li><li class="chapter-item expanded "><a href="../thespis_impl/supervision.html"><strong aria-hidden="true">6.2.</strong> Supervising an actor</a></li><li class="chapter-item expanded "><a href="../thespis_impl/concurrent.html"><strong aria-hidden="true">6.3.</strong> Processing messages concurrently</a></li><li class="chapter-item expanded "><a href="../thespis_impl/abstraction.html"><strong aria-hidden="true">6.4.</strong> Abstract the Actor type</a></li><li class="chapter-item expanded "><a href="../thespis_impl/debugging.html"><strong aria-hidden="true">6.5.</strong> Debugging</a></li></ol></li><li class="chapter-item expanded "><a href="../thespis_remote/introduction.html"><strong aria-hidden="true">7.</strong> thespis_remote</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../thespis_remote/service_map.html"><strong aria-hidden="true">7.1.</strong> ServiceMap</a></li><li class="chapter-item expanded "><a href="../thespis_remote/peer.html"><strong aria-hidden="true">7.2.</strong> Peer</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -130,17 +132,21 @@
                     <h1 class="menu-title">Thespis User Guide</h1>
 
                     <div class="right-buttons">
+                        
                         <a href="../print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
                         </a>
                         
+                        
+                        
+
                     </div>
                 </div>
 
                 
                 <div id="search-wrapper" class="hidden">
                     <form id="searchbar-outer" class="searchbar-outer">
-                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
                     </form>
                     <div id="searchresults-outer" class="searchresults-outer hidden">
                         <div id="searchresults-header" class="searchresults-header"></div>
@@ -161,7 +167,7 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#desugar-addrbuilder" id="desugar-addrbuilder">Desugar Addr::builder()</a></h1>
+                        <h1 id="desugar-addrbuilder"><a class="header" href="#desugar-addrbuilder">Desugar Addr::builder()</a></h1>
 <p>Even if you will mostly be using the convenience builder to start your actors, its good to have an understanding of how things work at a lower level. So what would things look like if we wanted to manually create an actor? We will keep the simple example from the last chapter but desugar it. We already showed the desugaring of the <code>async_fn</code> macro. Here we show a full working example with the main function as desugared as we can. Just know that there are intermediate steps on the builder API if you only want to override certain parameters.</p>
 <pre><pre class="playground"><code class="language-rust">use
 {
@@ -202,7 +208,7 @@ async fn main() -&gt; Result&lt; (), Box&lt;dyn Error&gt; &gt;
    let (tx, rx)  = mpsc::channel( 5 );
    let tx        = Box::new( tx.sink_map_err( |e| Box::new(e) as SinkError ) );
    let mb        = Mailbox::new( Some(&quot;HelloWorld&quot;.into()), Box::new(rx) );
-   let mut addr  = Addr::new( mb.id(), mb.name(), tx );
+   let mut addr  = mb.addr( tx );
    let actor     = MyActor;
 
    let handle = AsyncStd.spawn_handle( mb.start( actor ) )?;
@@ -211,13 +217,25 @@ async fn main() -&gt; Result&lt; (), Box&lt;dyn Error&gt; &gt;
 
    assert_eq!( &quot;world&quot;, dbg!(result) );
 
+   // This allows the mailbox to close. Otherwise the await below would hang.
+   //
    drop( addr );
-   handle.await;
+
+   // The JoinHandle will allow you to recover either your actor or the mailbox.
+   //
+   let actor = match handle.await
+   {
+      MailboxEnd::Actor(a) =&gt; a,
+
+      // This would happen if your actor had panicked while handling a message.
+      //
+      MailboxEnd::Mailbox(_mailbox) =&gt; unreachable!(),
+   };
 
    Ok(())
 }
 </code></pre></pre>
-<h2><a class="header" href="#channels" id="channels">Channels</a></h2>
+<h2 id="channels"><a class="header" href="#channels">Channels</a></h2>
 <p>In thespis you can choose what channel will be used for communication between the address and the mailbox. Out of the box the builder supports both tokio and futures channels, in bounded and unbounded forms. But you might want to try a different channel type. One interesting application is if you want to use a channel that overwrites older messages instead of providing back pressure, like the one in the <em>ring-channel</em> crate.</p>
 <p>The abstractions the thespis types work on are defined as:</p>
 <pre><pre class="playground"><code class="language-rust">
@@ -246,7 +264,7 @@ impl&lt;'a, T, Item, E&gt; CloneSink&lt;'a, Item, E&gt; for T
 }
 
 
-/// A boxed error type for the sink
+/// A boxed error type for the sink.
 //
 pub type SinkError = Box&lt; dyn std::error::Error + Send + 'static &gt;;
 
@@ -259,19 +277,19 @@ pub type ChanSender&lt;A&gt; = Box&lt; dyn CloneSink&lt; 'static, BoxEnvelope&lt
 pub type ChanReceiver&lt;A&gt; = Box&lt; dyn futures::Stream&lt;Item=BoxEnvelope&lt;A&gt;&gt; + Send + Unpin &gt;;
 <span class="boring">}
 </span></code></pre></pre>
-<p>Thus the sender must implement <code>Sink</code>, <code>Clone</code>, <code>Unpin</code> and <code>Send</code> and it's error type must be <code>Box&lt; dyn std::error::Error + Send + 'static &gt;</code>. The receiver must be infallible and implement <code>Stream</code>, <code>Send</code> and <code>Unpin</code>. If your favorite channel implementation does not provide the <code>Sink</code> interface on it's sender, check out the <code>async_chanx</code> crate which provides some <code>Sink</code> implementations for you.</p>
-<h2><a class="header" href="#mailbox-and-addr" id="mailbox-and-addr">Mailbox and Addr</a></h2>
+<p>Thus the sender must implement <code>Sink</code>, <code>Clone</code>, <code>Unpin</code> and <code>Send</code> and it's error type must be <code>Box&lt; dyn std::error::Error + Send + 'static &gt;</code>. The receiver must be infallible and implement <code>Stream</code>, <code>Send</code> and <code>Unpin</code>. If your favorite channel implementation does not provide the <code>Sink</code> interface on it's sender, you can often wrap them and implement the <code>Sink</code> yourself.</p>
+<h2 id="mailbox-and-addr"><a class="header" href="#mailbox-and-addr">Mailbox and Addr</a></h2>
 <p>Next we create our mailbox and address:</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>let mb       = Mailbox::new( Some(&quot;HelloWorld&quot;.into()), Box::new(rx) );
-let mut addr = Addr::new( mb.id(), mb.name(), tx );
+let mut addr = mb.addr( tx );
 <span class="boring">}
 </span></code></pre></pre>
 <p>You can see that the constructors take a few parameters. The first parameter on <code>Mailbox::new</code> is an optional name. This will be used in logging to help you identify which actor is doing what. The id in the second line is similar but is just a numeric counter. Every mailbox created in the process will have a unique numeric id, but you can also name them to make it easier to understand your logs. <code>Addr</code> also exposes both the <code>id</code> and <code>name</code>. If two addresses return the same <code>id</code>, they both talk to the same mailbox and thus actor.</p>
-<p>We feed both ends of the channel to the constructors of <code>Mailbox</code> and <code>Addr</code>. You may notice that we just created both the mailbox and the address without even having instantiated an actor yet. That is because we only really need an actor when we start the mailbox. This has an interesting property. If we want our actor to have a copy of it's own address, we can just pass it along in it's constructor, since as soon as we start it we can only communicate to it through messages. It would be a bit of a pain to have to create a specific message type to give the actor it's own address.</p>
-<h2><a class="header" href="#starting-the-mailbox" id="starting-the-mailbox">Starting the mailbox</a></h2>
+<p>We feed both ends of the channel to the constructors of <code>Mailbox</code> and its <code>addr</code> method. You may notice that we just created both the mailbox and the address without even having instantiated an actor yet. That is because we only really need an actor when we start the mailbox. This has an interesting property. If we want our actor to have a copy of it's own address, we can just pass it along in it's constructor, since as soon as we start it we can only communicate to it through messages. It would be a bit of a pain to have to create a specific message type to give the actor it's own address.</p>
+<h2 id="starting-the-mailbox"><a class="header" href="#starting-the-mailbox">Starting the mailbox</a></h2>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
@@ -281,7 +299,7 @@ let handle = AsyncStd.spawn_handle( mb.start( actor ) )?;
 </span></code></pre></pre>
 <p>Next we create an actor and pass it to <code>Mailbox::start</code>. This method returns a future that you can spawn however way you like on the executor of your choice. <code>Mailbox</code> has a a few convenience methods as well which allow you to pass the executor by reference which avoids having to import the spawn traits as well as local versions for spawning actors that aren't <code>Send</code>. Check the API docs.</p>
 <p>We use the <code>AsyncStd</code> wrapper from <em>async_executors</em> here. One essential difference with using <code>async-std</code> directly is that the joinhandle this returns will cancel the future when you drop it, which is a way you can stop an actor. The recommended way is to drop all addresses to the actor.</p>
-<h2><a class="header" href="#stopping-the-actor" id="stopping-the-actor">Stopping the actor</a></h2>
+<h2 id="stopping-the-actor"><a class="header" href="#stopping-the-actor">Stopping the actor</a></h2>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {

@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Processing messages concurrently - Thespis User Guide</title>
+        <title>Peer - Thespis User Guide</title>
         
         
 
@@ -97,7 +97,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../actor_model.html"><strong aria-hidden="true">2.</strong> What is the actor model?</a></li><li class="chapter-item expanded "><a href="../what_is_thespis.html"><strong aria-hidden="true">3.</strong> What is thespis?</a></li><li class="chapter-item expanded "><a href="../pitfalls.html"><strong aria-hidden="true">4.</strong> Pitfalls Checklist</a></li><li class="chapter-item expanded "><a href="../thespis_impl/local.html"><strong aria-hidden="true">5.</strong> !Send Actors</a></li><li class="chapter-item expanded "><a href="../thespis_impl/thespis_impl.html"><strong aria-hidden="true">6.</strong> thespis_impl</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../thespis_impl/desugar.html"><strong aria-hidden="true">6.1.</strong> Desugar Addr::builder()</a></li><li class="chapter-item expanded "><a href="../thespis_impl/supervision.html"><strong aria-hidden="true">6.2.</strong> Supervising an actor</a></li><li class="chapter-item expanded "><a href="../thespis_impl/concurrent.html" class="active"><strong aria-hidden="true">6.3.</strong> Processing messages concurrently</a></li><li class="chapter-item expanded "><a href="../thespis_impl/abstraction.html"><strong aria-hidden="true">6.4.</strong> Abstract the Actor type</a></li><li class="chapter-item expanded "><a href="../thespis_impl/debugging.html"><strong aria-hidden="true">6.5.</strong> Debugging</a></li></ol></li><li class="chapter-item expanded "><a href="../thespis_remote/introduction.html"><strong aria-hidden="true">7.</strong> thespis_remote</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../thespis_remote/service_map.html"><strong aria-hidden="true">7.1.</strong> ServiceMap</a></li><li class="chapter-item expanded "><a href="../thespis_remote/peer.html"><strong aria-hidden="true">7.2.</strong> Peer</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../actor_model.html"><strong aria-hidden="true">2.</strong> What is the actor model?</a></li><li class="chapter-item expanded "><a href="../what_is_thespis.html"><strong aria-hidden="true">3.</strong> What is thespis?</a></li><li class="chapter-item expanded "><a href="../pitfalls.html"><strong aria-hidden="true">4.</strong> Pitfalls Checklist</a></li><li class="chapter-item expanded "><a href="../thespis_impl/local.html"><strong aria-hidden="true">5.</strong> !Send Actors</a></li><li class="chapter-item expanded "><a href="../thespis_impl/thespis_impl.html"><strong aria-hidden="true">6.</strong> thespis_impl</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../thespis_impl/desugar.html"><strong aria-hidden="true">6.1.</strong> Desugar Addr::builder()</a></li><li class="chapter-item expanded "><a href="../thespis_impl/supervision.html"><strong aria-hidden="true">6.2.</strong> Supervising an actor</a></li><li class="chapter-item expanded "><a href="../thespis_impl/concurrent.html"><strong aria-hidden="true">6.3.</strong> Processing messages concurrently</a></li><li class="chapter-item expanded "><a href="../thespis_impl/abstraction.html"><strong aria-hidden="true">6.4.</strong> Abstract the Actor type</a></li><li class="chapter-item expanded "><a href="../thespis_impl/debugging.html"><strong aria-hidden="true">6.5.</strong> Debugging</a></li></ol></li><li class="chapter-item expanded "><a href="../thespis_remote/introduction.html"><strong aria-hidden="true">7.</strong> thespis_remote</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../thespis_remote/service_map.html"><strong aria-hidden="true">7.1.</strong> ServiceMap</a></li><li class="chapter-item expanded "><a href="../thespis_remote/peer.html" class="active"><strong aria-hidden="true">7.2.</strong> Peer</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -167,135 +167,18 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="processing-messages-concurrently"><a class="header" href="#processing-messages-concurrently">Processing messages concurrently</a></h1>
-<p>In principle an actor processes one message at a time. This restriction only makes sense however if the actor has mutable state. This avoids all synchronization problems. But what if your actor doesn't have mutable state? In that case we can process messages concurrently without any issues.</p>
-<p>The following example also shows how you can tie the lifetime of the sub-tasks to the lifetime of the actor by using a nursery:</p>
-<pre><pre class="playground"><code class="language-rust">use
-{
-   thespis           :: { *                                                 } ,
-   thespis_impl      :: { *                                                 } ,
-   std               :: { error::Error                                      } ,
-   futures           :: { FutureExt, task::{ SpawnError }                   } ,
-   async_executors   :: { AsyncStd, SpawnHandle, SpawnHandleExt, JoinHandle } ,
-   async_nursery     :: { Nursery, NurseErr, Nurse, NurseExt                } ,
-};
-
-
-type DynError = Box&lt;dyn Error + Send + Sync&gt;;
-
-
-#[ derive( Actor ) ]
-//
-struct MyActor
-{
-   // We store the nursery_handle on our actor. That way the lifetime of all
-   // tasks inside the nursery is tied to the lifetime of our actor. If we drop
-   // the actor, all subtasks that are still running will be dropped.
-   //
-   // Alternatively we could have a Handler for a Stop message, which would await
-   // the nursery_handle to wait for all subtasks to finish before dropping this actor.
-   // That last one can even be combined with a timeout to limit how long we wait for
-   // subtasks to finish naturally before dropping them.
-   //
-   nursery: Box&lt; dyn Nurse&lt;()&gt; + Send &gt;,
-   _nursery_handle: JoinHandle&lt;()&gt;,
-}
-
-
-struct Ping;
-
-impl Message for Ping { type Return = Result&lt;(), NurseErr&gt;; }
-
-
-impl MyActor
-{
-   pub fn new( exec: impl SpawnHandle&lt;()&gt; + Clone + Send + 'static ) -&gt; Result&lt;Self, SpawnError&gt;
-   {
-      let (nursery, output) = Nursery::new( Box::new( exec.clone() ) );
-
-      let _nursery_handle = exec.spawn_handle( output )?;
-      let nursery         = Box::new( nursery );
-
-      Ok( Self
-      {
-          nursery        ,
-         _nursery_handle ,
-      })
-   }
-}
-
-
-impl Handler&lt;Ping&gt; for MyActor
-{
-   // For this usecase we don't use the `async_fn` macro since we don't want our entire
-   // handler to be in the returned future. We want to set some thing up first.
-   //
-   fn handle( &amp;mut self, _msg: Ping ) -&gt; Return&lt;'_, &lt;Ping as Message&gt;::Return &gt;
-   {
-      // If self had properties wrapped in Arc, we could clone them here to pass them
-      // into the future.
-      //
-      // However we can't actually pass the reference to self in if we want it
-      // to run concurrently.
-      //
-      // In theory you can have something in an Arc&lt;Mutex&gt;&gt; or atomic variables, but
-      // you really must be careful. As these run concurrently, values will change in the
-      // middle of processing which is a footgun.
-      //
-      // If we would need to update self with the result of an async operation, we can
-      // store our own address on self, clone that to pass it into the spawned task
-      // and send the result to ourselves.
-      //
-      let processing = async move
-      {
-         // do something useful.
-      };
-
-      // Processing will now run concurrently.
-      //
-      let result = self.nursery.nurse( processing );
-
-      // If spawning failed, we pass that back to caller.
-      // We are now immediately ready to process the next message even while processing is
-      // still running.
-      //
-      // We return the result of processing to the caller.
-      //
-      async move { result }.boxed()
-   }
-}
-
-
-#[async_std::main]
-//
-async fn main() -&gt; Result&lt; (), DynError &gt;
-{
-   let     actor = MyActor::new( Box::new(AsyncStd) )?;
-   let mut addr  = Addr::builder().start( actor, &amp;AsyncStd )?;
-
-   // Admittedly, this looks a bit weird. Call is fallible, and it returns a result over
-   // the NurseErr, since the handler needs to spawn and spawning is fallible.
-   //
-   addr.call( Ping ).await??;
-
-   Ok(())
-}
-</code></pre></pre>
+                        <h1 id="peer"><a class="header" href="#peer">Peer</a></h1>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                         
-                            <a rel="prev" href="../thespis_impl/supervision.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../thespis_remote/service_map.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
                         
 
-                        
-                            <a rel="next" href="../thespis_impl/abstraction.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                                <i class="fa fa-angle-right"></i>
-                            </a>
                         
 
                         <div style="clear: both"></div>
@@ -305,15 +188,11 @@ async fn main() -&gt; Result&lt; (), DynError &gt;
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
-                    <a rel="prev" href="../thespis_impl/supervision.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../thespis_remote/service_map.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 
 
-                
-                    <a rel="next" href="../thespis_impl/abstraction.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                        <i class="fa fa-angle-right"></i>
-                    </a>
                 
             </nav>
 

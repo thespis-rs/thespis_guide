@@ -26,7 +26,9 @@
         <link rel="stylesheet" href="css/variables.css">
         <link rel="stylesheet" href="css/general.css">
         <link rel="stylesheet" href="css/chrome.css">
+        
         <link rel="stylesheet" href="css/print.css" media="print">
+        
 
         <!-- Fonts -->
         <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
@@ -95,7 +97,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="actor_model.html"><strong aria-hidden="true">2.</strong> What is the actor model?</a></li><li class="chapter-item expanded "><a href="what_is_thespis.html" class="active"><strong aria-hidden="true">3.</strong> What is thespis?</a></li><li class="chapter-item expanded "><a href="pitfalls.html"><strong aria-hidden="true">4.</strong> Pitfalls Checklist</a></li><li class="chapter-item expanded "><a href="thespis_impl/thespis_impl.html"><strong aria-hidden="true">5.</strong> thespis_impl</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="thespis_impl/desugar.html"><strong aria-hidden="true">5.1.</strong> Desugar Addr::builder()</a></li><li class="chapter-item expanded "><a href="thespis_impl/supervision.html"><strong aria-hidden="true">5.2.</strong> Supervising an actor</a></li><li class="chapter-item expanded "><a href="thespis_impl/concurrent.html"><strong aria-hidden="true">5.3.</strong> Processing messages concurrently</a></li><li class="chapter-item expanded "><a href="thespis_impl/abstraction.html"><strong aria-hidden="true">5.4.</strong> Abstract the Actor type</a></li></ol></li><li class="chapter-item expanded "><a href="thespis_remote/introduction.html"><strong aria-hidden="true">6.</strong> thespis_remote</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="actor_model.html"><strong aria-hidden="true">2.</strong> What is the actor model?</a></li><li class="chapter-item expanded "><a href="what_is_thespis.html" class="active"><strong aria-hidden="true">3.</strong> What is thespis?</a></li><li class="chapter-item expanded "><a href="pitfalls.html"><strong aria-hidden="true">4.</strong> Pitfalls Checklist</a></li><li class="chapter-item expanded "><a href="thespis_impl/local.html"><strong aria-hidden="true">5.</strong> !Send Actors</a></li><li class="chapter-item expanded "><a href="thespis_impl/thespis_impl.html"><strong aria-hidden="true">6.</strong> thespis_impl</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="thespis_impl/desugar.html"><strong aria-hidden="true">6.1.</strong> Desugar Addr::builder()</a></li><li class="chapter-item expanded "><a href="thespis_impl/supervision.html"><strong aria-hidden="true">6.2.</strong> Supervising an actor</a></li><li class="chapter-item expanded "><a href="thespis_impl/concurrent.html"><strong aria-hidden="true">6.3.</strong> Processing messages concurrently</a></li><li class="chapter-item expanded "><a href="thespis_impl/abstraction.html"><strong aria-hidden="true">6.4.</strong> Abstract the Actor type</a></li><li class="chapter-item expanded "><a href="thespis_impl/debugging.html"><strong aria-hidden="true">6.5.</strong> Debugging</a></li></ol></li><li class="chapter-item expanded "><a href="thespis_remote/introduction.html"><strong aria-hidden="true">7.</strong> thespis_remote</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="thespis_remote/service_map.html"><strong aria-hidden="true">7.1.</strong> ServiceMap</a></li><li class="chapter-item expanded "><a href="thespis_remote/peer.html"><strong aria-hidden="true">7.2.</strong> Peer</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -130,17 +132,21 @@
                     <h1 class="menu-title">Thespis User Guide</h1>
 
                     <div class="right-buttons">
+                        
                         <a href="print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
                         </a>
                         
+                        
+                        
+
                     </div>
                 </div>
 
                 
                 <div id="search-wrapper" class="hidden">
                     <form id="searchbar-outer" class="searchbar-outer">
-                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
                     </form>
                     <div id="searchresults-outer" class="searchresults-outer hidden">
                         <div id="searchresults-header" class="searchresults-header"></div>
@@ -161,25 +167,33 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#what-is-thespis" id="what-is-thespis">What is thespis?</a></h1>
+                        <h1 id="what-is-thespis"><a class="header" href="#what-is-thespis">What is thespis?</a></h1>
 <p>When working on asynchronous projects in Rust I discovered the actor model thanks to <a href="https://docs.rs/actix/">actix</a>. I immediately found the model a very good fit for both Rust and asynchronous design. I started to implement software using the actix library and soon ran into a number of issues:</p>
 <ul>
 <li>it was in futures 0.1 (has been updated by now)</li>
 <li>doesn't work on wasm</li>
 <li>documentation was lackluster</li>
 <li>code base big and complicated</li>
+<li>didn't have remote actors</li>
 <li>my reasoning didn't seem to match with the actix lead developer</li>
 </ul>
 <p>I tried briefly to evaluate what it would take to implement the features I wanted in actix, but it turned out to be complicated. Thus I set off rewriting from scratch. It has taken a long time, but I think the result is still relevant and worth it.</p>
-<p>In the mean time, so many actor libraries have popped up that I have lost track of what each one exactly offers.</p>
-<h1><a class="header" href="#features" id="features">Features</a></h1>
+<p>In the mean time, so many actor libraries have popped up that I have lost track of what each one exactly offers, you'll have to do your own research. Here is a list: https://lib.rs/search?q=actor</p>
+<h1 id="features"><a class="header" href="#features">Features</a></h1>
 <ul>
-<li><strong>work everywhere</strong>: including on wasm. Note that async rust on embedded is still in it's infancy and I have not looked into it specifically, so no promises there for now. Thespis also uses boxing extensively, which might be a problem on embedded.</li>
-<li><strong>minimal API design</strong> As an example compared to actix, there is no <em>MessageResponse</em> trait, no <em>Context</em> object, no <em>ActorFuture</em>, no DNS resolver, no <em>System</em> nor <em>Arbiter</em>, no <em>ActorStream</em>, ... The address in thespis implements the <em>Sink</em> trait, so you can easily chain it with streams. The code base (without remote actors) is about 750 SLOC.</li>
-<li><strong>full control</strong>: you can interact at a low level with the address and the mailbox of an actor, you can change their implementation for your own as long as they implement the required traits and you can even plug in the channel of your choice between the address and the mailbox.</li>
+<li><strong>work on Wasm</strong>: Note that async rust on embedded is still in it's infancy and I have not looked into it specifically, so no promises there for now. Thespis also uses boxing extensively, which might be a problem on <code>#[no_std]</code>.</li>
+<li><strong>minimal API design</strong> As an example compared to actix, there is no <em>MessageResponse</em> trait, no <em>Context</em> object, no <em>ActorFuture</em>, no DNS resolver, no <em>System</em> nor <em>Arbiter</em>, no <em>ActorStream</em>, ...  The code base (without remote actors) is about 750 SLOC.</li>
+<li><strong>abstractions</strong>: The address in thespis implements the <em>Sink</em> trait, so you can easily chain it with streams. Make an actor observable with <a href="https://crates.io/crates/pharos"><em>pharos</em></a> and you have a pub-sub pattern. You can plug in the channel of your choice between the address and the mailbox.</li>
+<li><strong>full control</strong>: you can interact at a low level with the address and the mailbox of an actor, you can change their implementation for your own as long as they implement the required traits.</li>
 <li><strong>remote actors</strong>: <em>thespis_remote</em> is a library that allows you to communicate with other processes and send messages to a remote process as if it was an actor in the local application. As far as I can tell, <a href="https://docs.rs/kay"><em>kay</em></a> is the only other Rust actor library that has remote actors.</li>
+<li><strong>supervision</strong>: <em>thespis_impl</em> supports supervision without even needing a <code>Supervisor</code> type.</li>
 <li><strong>executor agnostic</strong></li>
 <li><strong>well tested and documented</strong></li>
+</ul>
+<h1 id="whats-missing"><a class="header" href="#whats-missing">What's missing</a></h1>
+<ul>
+<li><strong>message priority</strong>: Since we work with <code>Sink</code> for the channel sender, which does not have an API for indicating the priority and the message is boxed inside the channel, it's not quite straightforward how this could be supported.</li>
+<li><strong>skipping messages</strong>: The actor doesn't have access to the queue of messages. It can't observe them and decide what to process next.</li>
 </ul>
 <p>In thespis, interface and implementation are 2 different libraries. The idea is that the interface defines the contract of what an actor is in terms of the Rust type system, but that you can swap out the implementation with something else yet remain compatible with other code that uses actors. You could for example write an implementation which uses actix under the hood if you wanted to create interop.</p>
 
