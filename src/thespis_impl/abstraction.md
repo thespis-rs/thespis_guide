@@ -35,22 +35,13 @@ impl<T> AddressFooBar for T
 {}
 ```
 
-Now we can have `Box< dyn AddressFooBar >` and be able to send both `Foo` and `Bar` messages.
+Now we can have `Box< dyn AddressFooBar >` and be able to send both `Foo` and `Bar` messages. The [trait_set](https::crates.io/crates/trait_set) crate can make this more streamlined.
 
 # Unknown unknowns
 
-Sometimes it's not even known in your library which types of actors and which types of messages you will have to handle, because they are user defined. Yet you still need to store a bunch addresses. You will have some other information at runtime which will indicate which type the actor and message are.
+Sometimes it's not even known in your library which types of actors and which types of messages you will have to handle, because they are user defined. Yet you still need to store a bunch addresses. You will need some other information at runtime that indicates which type the actor and message are, to enable downcasting.
 
-In this case you can store the addresses as `Box< dyn Any >` and then downcast them at runtime to the right type. However, we cannot cross cast to another trait object, so we need an actual struct. _thespis_impl_ actually provides such a struct for you. It's defined as:
-
-```rust
-pub struct Receiver<M: Message>
-{
-   rec: BoxAddress<M, ThesErr>
-}
-```
-
-It's just a simple wrapper around a boxed address that re-implements the relevant traits so you can use it directly as an address.
+In this case you can store the addresses as `Box< dyn Any >` and then downcast them at runtime to the right type. We can store a collection eg. `HashMap` of `Box< dyn Any >` and downcast them to `Box< dyn Address<M, E> >`. You will need to store (eg. in the keys of your hashmap) what type you are actually holding to downcast it. See the [recipient_any example](https://github.com/thespis-rs/thespis_remote/tree/master/examples/recipient_any.rs).
 
 
 # Cloning trait objects

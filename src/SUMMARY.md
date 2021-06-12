@@ -4,7 +4,7 @@
 - [What is the actor model?](actor_model.md)
 - [What is thespis?](what_is_thespis.md)
 - [Pitfalls Checklist](pitfalls.md)
-- [!Send Actors](thespis_impl/local.md)
+- [!Send Actors](local.md)
 
 - [thespis_impl](thespis_impl/thespis_impl.md)
   - [Desugar Addr::builder()](thespis_impl/desugar.md)

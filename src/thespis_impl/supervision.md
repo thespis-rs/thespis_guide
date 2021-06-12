@@ -4,7 +4,7 @@ A common pattern in actor software is supervision. The idea is to monitor a hier
 
 The following example is relatively straightforward. The main feature allowing supervising in thespis is that the mailbox future returns the mailbox to you if the actor panics while processing a message. This means that you can just instantiate a new actor and spawn the mailbox again and it will be fully operational. All addresses to it will just remain valid.
 
-**Warning**: This does mean that mailbox uses catch unwind on your handlers. That means they should be unwindsafe, but as you shouldn't be using shared mutability anyway this should already be the case.
+**Warning**: This does mean that mailbox uses catch unwind on your handlers. That means your messages should be unwindsafe, but as you shouldn't be using shared mutability anyway this should already be the case.
 
 
 ```rust
@@ -64,13 +64,14 @@ struct Supervise<A: Actor>
    mailbox : Option< JoinHandle<MailboxEnd<A>>> > ,
 
    // A closure that knows how to instantiate the supervised actor.
+   // You could also require that A: Default.
    //
    create: Box< dyn FnMut() ->A + Send > ,
 }
 
 impl<A: Actor + Send> Message for Supervise<A>
 {
-   type Return = Option< Addr<A> >;
+   type Return = Option< Addr<A> >
 }
 
 

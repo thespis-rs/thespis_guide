@@ -45,7 +45,7 @@ async fn main() -> Result< (), Box<dyn Error> >
    //
    let mut addr = Addr::builder().start( MyActor, &AsyncStd )?;
 
-   let result = addr.call( Hello( "hello".into() ) ).await?;
+   let result = addr.call( Hello("hello".into()) ).await?;
 
    assert_eq!( "world", result );
 
@@ -63,7 +63,7 @@ Let's quickly take a tour of the anatomy of this simple program:
 struct MyActor;
 ```
 
-`Actor` is a trait defined in the _thespis_ crate. It has no required methods, so you can easily derive it. `MyActor` here is what generally holds the (mutable) state of your actor. In this simple example there is no state, but otherwise you could manipulated it from within the implementation of `Handler<T>`. The mailbox will take ownership of your actor and after that you can only communicate with it by sending messages through the address you get back. Once you give it to the mailbox you can no longer call methods on it.
+`Actor` is a trait defined in the _thespis_ crate. It has no required methods, so you can easily derive it. `MyActor` here is what generally holds the (mutable) state of your actor. In this simple example there is no state, but otherwise you can manipulate it from within the implementation of `Handler<T>`. The mailbox will take ownership of your actor and after that you can only communicate with it by sending messages through the address you get back. Once you give it to the mailbox you can no longer call methods on it.
 
 ```rust
 struct Hello( String );
@@ -76,7 +76,7 @@ impl Message for Hello
 
 `Hello` is a message type. The type system will guarantee that you can never send a message type to an actor unless it implements `Handler` for that type and the type implements the `Message` trait. As you will have to implement this trait for your message types, you will have to wrap types that are not defined in your crate in order to use them as a message. Here we wrap `String`. If your handler might panic, please make sure the message type is `UnwindSafe`, as the mailbox will call `catch_unwind` on the handler method. This allows us to elegantly allow supervising of actors. All together it is recommended that your handlers don't panic, rather return a `Result` if they need to be fallible. Nevertheless, messages in the actor model are meant to be data and not have any shared resources like locks or references in them.
 
-The associated type is the return type of the handler. When using `Addr::call` your actor can return a value to the caller, making it easy to implement request-response type communication, mimicking a method call. Sending a message to an actor is always asynchronous. Note: we could also have written `-> <Hello as Message>::Return` as the return type here. In any case, it needs to be the same type.
+The associated type is the return type of the handler. When using `Address::call` your actor can return a value to the caller, making it easy to implement request-response type communication, mimicking a method call. Sending a message to an actor is always asynchronous. Note: we could also have written `-> <Hello as Message>::Return` as the return type here. In any case, it needs to be the same type.
 
 ```rust
 impl Handler< Hello > for MyActor
@@ -132,10 +132,10 @@ allowing us to be executor agnostic. We could just as well have given it a _toki
 Note that this function takes our actor by value as we shouldn't access it anymore directly once it starts processing messages.
 
 ```rust
-let result = addr.call( Ping( "hello".into() ) ).await?;
+let result = addr.call( Hello("hello".into()) ).await?;
 ```
 
-We use `Address::call` to send a message to our actor. This method will return to us a future that will resolve to the answer our handler returns. Note that `Addr` also implements `futures_sink::Sink`. You can use the combinators from the futures crate to forward an entire stream into the address, as long as the actor implements `Handler` for the type the stream produces. The `send` method from the `Sink` trait will drop the returned value and will return to us as soon as the message is delivered to the mailbox, without waiting for the actor to process the message.
+We use `Address::call` to send a message to our actor. This method will return to us a future that will resolve to the answer our handler returns. Note that `Addr` also implements `futures_sink::Sink`. You can use the combinators from the futures crate to forward an entire `Sink` into the address, as long as the actor implements `Handler` for the type the stream produces. The `send` method from the `Sink` trait will drop the returned value and will return to us as soon as the message is delivered to the mailbox, without waiting for the actor to process the message.
 
 Thus you can also use the `call` method even if you don't want to return any value to be sure that the message has been processed, where as `send` is more like throwing a message in a bottle. You will still get back pressure from `send` as it will block when the channel between the `Addr` and the mailbox is full (as long as it's not an unbounded channel that is).
 
@@ -144,7 +144,9 @@ In the next chapter we will take a look at desugaring the builder and manually c
 
 ## Weak and Strong addresses.
 
-It doesn't figure in the basic example, but the mailbox of the actor stops when all addresses to it are dropped. The `JoinHandle` from the executor will return your actor to you if you want to re-use it later. When the mailbox is stopped because your actor panicked, you will retrieve the mailbox instead and you can instantiate a new actor and spawn it on the same mailbox, so all addresses remain valid. This is further elaborated in the chapter about supervision.
+It doesn't figure in the basic example, but the mailbox of the actor stops when all addresses to it are dropped. The `JoinHandle` from the executor will return your actor to you if you want to re-use it later. When the mailbox is stopped because your actor panicked, you will retrieve the mailbox instead and you can instantiate a new actor and spawn it on the same mailbox, so all addresses remain valid. This is further elaborated in the chapter on supervision.
+
+As the mailbox future returns your actor, you must be conscious when you rely on your actor being dropped to stop other actors. The order in which you await the mailboxes can matter and sometimes you must explicitly wrap the call in `drop`.
 
 _Thespis_impl_ also has weak addresses. These addresses don't keep the mailbox alive. It is handy when for example the actor needs it's own address. In this case you don't necessarily want it to keep itself alive. Creating a weak address is simple:
 
@@ -162,5 +164,12 @@ let strong = match weak.strong()
    Err(e)   => {} // -> ThesErr::MailboxClosed.
 };
 ```
+
+__Important__: The way the strong count works is that the mailbox only stops when the channel returns `Poll::Pending`. That is it will continue to process messages after all strong addresses are dropped. However, `WeakAddr` will refuse to take more messages from this point. Once the channel returns `Poll::Pending`, the mailbox checks the strong count. If it is zero it exits.
+
+When the mailbox is already `Pending`, it will be woken up when the last strong address is dropped.
+
+This can be confusing if you use `Poll::Pending` for other purposes. For example the `stream_throttle` crate allows us to throttle a channel receiver. However, that will make it return `Poll::Pending` even though the channel isn't actually empty. If there are no strong addresses, the mailbox will stop and drop those messages. As most channels and stream wrappers don't properly implement or forward `Stream::size_hint`, we have no other way to check for an empty channel but to check for `Poll::Pending`.
+
 
 
