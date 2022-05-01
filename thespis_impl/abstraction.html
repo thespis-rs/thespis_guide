@@ -4,49 +4,28 @@
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
         <title>Abstract the Actor type - Thespis User Guide</title>
-        
-        
-
-
         <!-- Custom HTML head -->
-        
-
-
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff" />
 
-        
         <link rel="icon" href="../favicon.svg">
-        
-        
         <link rel="shortcut icon" href="../favicon.png">
-        
         <link rel="stylesheet" href="../css/variables.css">
         <link rel="stylesheet" href="../css/general.css">
         <link rel="stylesheet" href="../css/chrome.css">
-        
         <link rel="stylesheet" href="../css/print.css" media="print">
-        
-
         <!-- Fonts -->
         <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
-        
         <link rel="stylesheet" href="../fonts/fonts.css">
-        
-
         <!-- Highlight.js Stylesheets -->
         <link rel="stylesheet" href="../highlight.css">
         <link rel="stylesheet" href="../tomorrow-night.css">
         <link rel="stylesheet" href="../ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
-        
         <link rel="stylesheet" href="../custom.css">
-        
-
-        
     </head>
     <body>
         <!-- Provide site root to javascript -->
@@ -97,7 +76,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../actor_model.html"><strong aria-hidden="true">2.</strong> What is the actor model?</a></li><li class="chapter-item expanded "><a href="../what_is_thespis.html"><strong aria-hidden="true">3.</strong> What is thespis?</a></li><li class="chapter-item expanded "><a href="../pitfalls.html"><strong aria-hidden="true">4.</strong> Pitfalls Checklist</a></li><li class="chapter-item expanded "><a href="../thespis_impl/local.html"><strong aria-hidden="true">5.</strong> !Send Actors</a></li><li class="chapter-item expanded "><a href="../thespis_impl/thespis_impl.html"><strong aria-hidden="true">6.</strong> thespis_impl</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../thespis_impl/desugar.html"><strong aria-hidden="true">6.1.</strong> Desugar Addr::builder()</a></li><li class="chapter-item expanded "><a href="../thespis_impl/supervision.html"><strong aria-hidden="true">6.2.</strong> Supervising an actor</a></li><li class="chapter-item expanded "><a href="../thespis_impl/concurrent.html"><strong aria-hidden="true">6.3.</strong> Processing messages concurrently</a></li><li class="chapter-item expanded "><a href="../thespis_impl/abstraction.html" class="active"><strong aria-hidden="true">6.4.</strong> Abstract the Actor type</a></li><li class="chapter-item expanded "><a href="../thespis_impl/debugging.html"><strong aria-hidden="true">6.5.</strong> Debugging</a></li></ol></li><li class="chapter-item expanded "><a href="../thespis_remote/introduction.html"><strong aria-hidden="true">7.</strong> thespis_remote</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../thespis_remote/service_map.html"><strong aria-hidden="true">7.1.</strong> ServiceMap</a></li><li class="chapter-item expanded "><a href="../thespis_remote/peer.html"><strong aria-hidden="true">7.2.</strong> Peer</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../actor_model.html"><strong aria-hidden="true">2.</strong> What is the actor model?</a></li><li class="chapter-item expanded "><a href="../what_is_thespis.html"><strong aria-hidden="true">3.</strong> What is thespis?</a></li><li class="chapter-item expanded "><a href="../pitfalls.html"><strong aria-hidden="true">4.</strong> Pitfalls Checklist</a></li><li class="chapter-item expanded "><a href="../local.html"><strong aria-hidden="true">5.</strong> !Send Actors</a></li><li class="chapter-item expanded "><a href="../thespis_impl/thespis_impl.html"><strong aria-hidden="true">6.</strong> thespis_impl</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../thespis_impl/desugar.html"><strong aria-hidden="true">6.1.</strong> Desugar Addr::builder()</a></li><li class="chapter-item expanded "><a href="../thespis_impl/supervision.html"><strong aria-hidden="true">6.2.</strong> Supervising an actor</a></li><li class="chapter-item expanded "><a href="../thespis_impl/concurrent.html"><strong aria-hidden="true">6.3.</strong> Processing messages concurrently</a></li><li class="chapter-item expanded "><a href="../thespis_impl/abstraction.html" class="active"><strong aria-hidden="true">6.4.</strong> Abstract the Actor type</a></li><li class="chapter-item expanded "><a href="../thespis_impl/debugging.html"><strong aria-hidden="true">6.5.</strong> Debugging</a></li></ol></li><li class="chapter-item expanded "><a href="../thespis_remote/introduction.html"><strong aria-hidden="true">7.</strong> thespis_remote</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../thespis_remote/service_map.html"><strong aria-hidden="true">7.1.</strong> ServiceMap</a></li><li class="chapter-item expanded "><a href="../thespis_remote/peer.html"><strong aria-hidden="true">7.2.</strong> Peer</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -105,7 +84,6 @@
         <div id="page-wrapper" class="page-wrapper">
 
             <div class="page">
-                
                 <div id="menu-bar-hover-placeholder"></div>
                 <div id="menu-bar" class="menu-bar sticky bordered">
                     <div class="left-buttons">
@@ -122,28 +100,20 @@
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
                         </ul>
-                        
                         <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
                             <i class="fa fa-search"></i>
                         </button>
-                        
                     </div>
 
                     <h1 class="menu-title">Thespis User Guide</h1>
 
                     <div class="right-buttons">
-                        
                         <a href="../print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
                         </a>
-                        
-                        
-                        
-
                     </div>
                 </div>
 
-                
                 <div id="search-wrapper" class="hidden">
                     <form id="searchbar-outer" class="searchbar-outer">
                         <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
@@ -154,8 +124,6 @@
                         </ul>
                     </div>
                 </div>
-                
-
                 <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
                 <script type="text/javascript">
                     document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
@@ -202,20 +170,10 @@ impl&lt;T&gt; AddressFooBar for T
 {}
 <span class="boring">}
 </span></code></pre></pre>
-<p>Now we can have <code>Box&lt; dyn AddressFooBar &gt;</code> and be able to send both <code>Foo</code> and <code>Bar</code> messages.</p>
+<p>Now we can have <code>Box&lt; dyn AddressFooBar &gt;</code> and be able to send both <code>Foo</code> and <code>Bar</code> messages. The <a href="https::crates.io/crates/trait_set">trait_set</a> crate can make this more streamlined.</p>
 <h1 id="unknown-unknowns"><a class="header" href="#unknown-unknowns">Unknown unknowns</a></h1>
-<p>Sometimes it's not even known in your library which types of actors and which types of messages you will have to handle, because they are user defined. Yet you still need to store a bunch addresses. You will have some other information at runtime which will indicate which type the actor and message are.</p>
-<p>In this case you can store the addresses as <code>Box&lt; dyn Any &gt;</code> and then downcast them at runtime to the right type. However, we cannot cross cast to another trait object, so we need an actual struct. <em>thespis_impl</em> actually provides such a struct for you. It's defined as:</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>pub struct Receiver&lt;M: Message&gt;
-{
-   rec: BoxAddress&lt;M, ThesErr&gt;
-}
-<span class="boring">}
-</span></code></pre></pre>
-<p>It's just a simple wrapper around a boxed address that re-implements the relevant traits so you can use it directly as an address.</p>
+<p>Sometimes it's not even known in your library which types of actors and which types of messages you will have to handle, because they are user defined. Yet you still need to store a bunch addresses. You will need some other information at runtime that indicates which type the actor and message are, to enable downcasting.</p>
+<p>In this case you can store the addresses as <code>Box&lt; dyn Any &gt;</code> and then downcast them at runtime to the right type. We can store a collection eg. <code>HashMap</code> of <code>Box&lt; dyn Any &gt;</code> and downcast them to <code>Box&lt; dyn Address&lt;M, E&gt; &gt;</code>. You will need to store (eg. in the keys of your hashmap) what type you are actually holding to downcast it. See the <a href="https://github.com/thespis-rs/thespis_remote/tree/master/examples/recipient_any.rs">recipient_any example</a>.</p>
 <h1 id="cloning-trait-objects"><a class="header" href="#cloning-trait-objects">Cloning trait objects</a></h1>
 <p>The clone trait is not object safe in Rust, so you can't make a trait object from a trait that requires implementers to also implement <code>Clone</code>. For this reason, the <code>Address</code> trait has a <code>clone_box</code> method that requires implementors to be able to produce a <code>BoxAddress&lt;M&gt;</code>. This way if you have a boxed address you can still clone it conveniently.</p>
 
@@ -223,67 +181,38 @@ impl&lt;T&gt; AddressFooBar for T
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                        
                             <a rel="prev" href="../thespis_impl/concurrent.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
-                        
-
-                        
                             <a rel="next" href="../thespis_impl/debugging.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
-                        
-
                         <div style="clear: both"></div>
                     </nav>
                 </div>
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                
                     <a rel="prev" href="../thespis_impl/concurrent.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
-                
-
-                
                     <a rel="next" href="../thespis_impl/debugging.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
-                
             </nav>
 
         </div>
 
-        
-
-        
-
-        
-
-        
         <script type="text/javascript">
             window.playground_copyable = true;
         </script>
-        
-
-        
-
-        
         <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
         <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
         <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
-        
-
         <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
         <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
         <script src="../book.js" type="text/javascript" charset="utf-8"></script>
 
         <!-- Custom JS scripts -->
-        
-
-        
-
     </body>
 </html>
