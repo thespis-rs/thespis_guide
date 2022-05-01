@@ -67,3 +67,8 @@ I kept this lifetime management, because usually having addresses around to acto
 One way to sidestep this is to pull the plug. That is if you cancel the future running the mailbox, well it's terminated, however this is not recommended. If you really want an actor to stop it's own mailbox, regardless of other components that might still want to use it, you can let it spawn itself so it can have a `JoinHandle` that it can use to abort the mailbox.
 
 [_futures::stream::abortable_](https://docs.rs/futures/0.3.15/futures/stream/fn.abortable.html) also let's you terminate a channel receiver manually. That's another way you can stop a mailbox.
+
+
+## Re-entrancy
+
+Some actor implementations do not adhere to the one message at a time. Thespis does not have this issue. It can to some extend solve the deadlock issue described above, [but it creates problems of it's own](https://swiftsenpai.com/swift/actor-reentrancy-problem/). I think _actix_ does this with the `ActorFuture`, but I haven't checked in a while, so take that with a grain of salt and double check.
