@@ -141,6 +141,86 @@ has control over what executor they use and on what threads they run actors.</p>
 <p>In practice it's not so simple. Rust requires one to be specific about <code>Send</code>ness in a number of type signatures, namely for a type in a <code>Box</code>. This means that we would have to double the whole interface and implementation if we were to support <code>!Send</code> messages. I have chosen not to do this for now.</p>
 <p>A compromise is made with <code>!Send</code> actors. It turns out we can support them with reasonable boilerplate. For this, <code>Handler</code> has 2 methods, <code>handle</code> and <code>handle_local</code>. Mailbox implementations should provide a way to be spawned locally, and call <code>handle_local</code> in that case.</p>
 <p>The interface keeps <code>handle</code> as a required method, but <code>handle_local</code> does call <code>handle</code> by default. This means there is no change in API for <code>Send</code> actors, but when you have a <code>!Send</code> actor, you must implement <code>handle_local</code> and provide an implementation for <code>handle</code> with an <code>unreachable</code>. This should never be called.</p>
+<h2 id="example"><a class="header" href="#example">Example</a></h2>
+<p>This is a basic example of a <code>!Send</code> actor:</p>
+<pre><pre class="playground"><code class="language-rust">//! Spawn an actor that is !Send.
+//
+use
+{
+   thespis         :: { *                                         } ,
+   thespis_impl    :: { Addr                                      } ,
+   futures         :: { task::LocalSpawnExt, executor::LocalPool  } ,
+   std             :: { marker::PhantomData, rc::Rc, error::Error } ,
+};
+
+
+#[ derive( Actor, Debug ) ] struct MyActor { i: u8, nosend: PhantomData&lt;Rc&lt;()&gt;&gt;}
+#[ derive( Clone, Debug ) ] struct Ping( String )   ;
+
+
+impl Message for Ping
+{
+   type Return = String;
+}
+
+
+impl MyActor
+{
+   async fn add( &amp;mut self, mut x: u8 ) -&gt; u8
+   {
+      x += 1;
+      x
+   }
+}
+
+
+impl Handler&lt;Ping&gt; for MyActor
+{
+   // Implement handle_local to enable !Send actor and mailbox.
+   //
+   #[async_fn_local] fn handle_local( &amp;mut self, _msg: Ping ) -&gt; String
+   {
+      // We can still access self across await points and mutably.
+      //
+      self.i = self.add( self.i ).await;
+      dbg!( &amp;self.i);
+      &quot;pong&quot;.into()
+   }
+
+   // It is necessary to provide handle in case of a !Send actor. It's a required method.
+   // For Send actors that implement handle, handle_local is automatically provided.
+   //
+   #[async_fn] fn handle( &amp;mut self, _msg: Ping ) -&gt; String
+   {
+      unreachable!( &quot;This actor is !Send and cannot be spawned on a threadpool&quot; );
+   }
+}
+
+
+fn main() -&gt; Result&lt; (), Box&lt;dyn Error&gt; &gt;
+{
+   let mut pool = LocalPool::new();
+   let     exec = pool.spawner();
+
+   let actor    = MyActor { i: 3, nosend: PhantomData };
+   let mut addr = Addr::builder().spawn_local( actor, &amp;exec )?;
+
+   exec.spawn_local( async move
+   {
+      let ping = Ping( &quot;ping&quot;.into() );
+
+      let result_local = addr.call( ping.clone() ).await.expect( &quot;Call&quot; );
+
+      assert_eq!( &quot;pong&quot;.to_string(), result_local );
+      dbg!( result_local );
+
+   })?;
+
+   pool.run();
+
+   Ok(())
+}
+</code></pre></pre>
 
                     </main>
 
