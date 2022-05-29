@@ -26,8 +26,12 @@ In the mean time, so many actor libraries have popped up that I have lost track 
 - __executor agnostic__
 - __well tested and documented__
 
+
+In thespis, interface and implementation are 2 different libraries. The idea is that the interface defines the contract of what an actor is in terms of the Rust type system, but that you can swap out the implementation with something else yet remain compatible with other code that uses actors. You could for example write an implementation which uses actix under the hood if you wanted to create interop.
+
+It also means that a library that wants to expose an actor API does not need to depend on the implementation, just the interface to implement the appropriate traits.
+
 # What's missing
 
 - __skipping messages__: The actor doesn't have access to the queue of messages. It can't observe them and decide what to process next. You could of course implement this by having a channel that allows for inspection of what's in it's buffer, but the `Mailbox` of `thespis_impl` does not deal with this for you.
 
-In thespis, interface and implementation are 2 different libraries. The idea is that the interface defines the contract of what an actor is in terms of the Rust type system, but that you can swap out the implementation with something else yet remain compatible with other code that uses actors. You could for example write an implementation which uses actix under the hood if you wanted to create interop.
