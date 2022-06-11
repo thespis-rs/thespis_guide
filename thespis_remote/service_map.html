@@ -76,7 +76,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../actor_model.html"><strong aria-hidden="true">2.</strong> What is the actor model?</a></li><li class="chapter-item expanded "><a href="../what_is_thespis.html"><strong aria-hidden="true">3.</strong> What is thespis?</a></li><li class="chapter-item expanded "><a href="../pitfalls.html"><strong aria-hidden="true">4.</strong> Pitfalls Checklist</a></li><li class="chapter-item expanded "><a href="../local.html"><strong aria-hidden="true">5.</strong> !Send Actors</a></li><li class="chapter-item expanded "><a href="../thespis_impl/thespis_impl.html"><strong aria-hidden="true">6.</strong> thespis_impl</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../thespis_impl/desugar.html"><strong aria-hidden="true">6.1.</strong> Desugar Addr::builder()</a></li><li class="chapter-item expanded "><a href="../thespis_impl/supervision.html"><strong aria-hidden="true">6.2.</strong> Supervising an actor</a></li><li class="chapter-item expanded "><a href="../thespis_impl/concurrent.html"><strong aria-hidden="true">6.3.</strong> Processing messages concurrently</a></li><li class="chapter-item expanded "><a href="../thespis_impl/abstraction.html"><strong aria-hidden="true">6.4.</strong> Abstract the Actor type</a></li><li class="chapter-item expanded "><a href="../thespis_impl/debugging.html"><strong aria-hidden="true">6.5.</strong> Debugging</a></li></ol></li><li class="chapter-item expanded "><a href="../thespis_remote/introduction.html"><strong aria-hidden="true">7.</strong> thespis_remote</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../thespis_remote/service_map.html" class="active"><strong aria-hidden="true">7.1.</strong> ServiceMap</a></li><li class="chapter-item expanded "><a href="../thespis_remote/peer.html"><strong aria-hidden="true">7.2.</strong> Peer</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../actor_model.html"><strong aria-hidden="true">2.</strong> What is the actor model?</a></li><li class="chapter-item expanded "><a href="../what_is_thespis.html"><strong aria-hidden="true">3.</strong> What is thespis?</a></li><li class="chapter-item expanded "><a href="../pitfalls.html"><strong aria-hidden="true">4.</strong> Pitfalls Checklist</a></li><li class="chapter-item expanded "><a href="../local.html"><strong aria-hidden="true">5.</strong> !Send Actors</a></li><li class="chapter-item expanded "><a href="../thespis_impl/thespis_impl.html"><strong aria-hidden="true">6.</strong> thespis_impl</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../thespis_impl/desugar.html"><strong aria-hidden="true">6.1.</strong> Desugar Addr::builder()</a></li><li class="chapter-item expanded "><a href="../thespis_impl/supervision.html"><strong aria-hidden="true">6.2.</strong> Supervising an actor</a></li><li class="chapter-item expanded "><a href="../thespis_impl/concurrent.html"><strong aria-hidden="true">6.3.</strong> Processing messages concurrently</a></li><li class="chapter-item expanded "><a href="../thespis_impl/abstraction.html"><strong aria-hidden="true">6.4.</strong> Abstract the Actor type</a></li><li class="chapter-item expanded "><a href="../thespis_impl/debugging.html"><strong aria-hidden="true">6.5.</strong> Debugging</a></li><li class="chapter-item expanded "><a href="../thespis_impl/backpressure.html"><strong aria-hidden="true">6.6.</strong> Backpressure</a></li></ol></li><li class="chapter-item expanded "><a href="../thespis_remote/introduction.html"><strong aria-hidden="true">7.</strong> thespis_remote</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../thespis_remote/service_map.html" class="active"><strong aria-hidden="true">7.1.</strong> ServiceMap</a></li><li class="chapter-item expanded "><a href="../thespis_remote/peer.html"><strong aria-hidden="true">7.2.</strong> Peer</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -138,19 +138,20 @@
                         <h1 id="servicemap"><a class="header" href="#servicemap">ServiceMap</a></h1>
 <p>A service map is a type that knows how to deliver messages to individual actors. It dispatches if you will. You can tell <code>Peer</code> to expose a set of services remotely by bundling them in a <code>ServiceMap</code> and registering that map.</p>
 <p>This makes it possible to expose different sets of services on different connections. For the moment it is not possible to dynamically change what services are exposed at runtime. The problem here is that we consider the service map a contract between two processes, so if all of a sudden we would stop providing certain services, the remote process might run into errors. This might change in the future, with some thought of how we inform a remote process of what services are available at any given time. One purpose might be to deal with authentication, enabling certain services only once a user has authenticated. However for now you have to deal with authentication yourself by adding a token in your messages. The receiving actor doesn't actually know which connection a message comes from.</p>
-<p>There are two implementations of <code>ServiceMap</code> provided by <em>thespis_remote</em>:</p>
+<p>There are three implementations of <code>ServiceMap</code> provided by <em>thespis_remote</em>:</p>
 <ul>
 <li><code>service_map!</code>, a macro</li>
 <li><code>RelayMap</code>, used for relaying messages to a different process.</li>
+<li><code>PubSub</code>, for relays to implement a publish/subscribe architecture.</li>
 </ul>
 <h2 id="service_map"><a class="header" href="#service_map"><code>service_map!</code></a></h2>
-<p>This is a macro because as it needs to deserialize your actor messages, it needs to know it's types, but that can only be provided inside your crate, not in <em>thespis_remote</em>. Thus it gives you all that functionality that needs to be in your crate to make things convenient and you wouldn't have to write that yourself. It's main use looks like:</p>
+<p>This is a macro because as it needs to deserialize your actor messages, it needs to know it's types, but that can only be provided inside your crate, not in <em>thespis_remote</em>. Thus it gives you all that functionality that needs to be in your crate to make things convenient so you don't have to write that yourself. It's main use looks like:</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>use
 {
-   thespis_remote :: { ThesWF, service_map    } ,
+   thespis_remote :: { CborWF, service_map    } ,
    serde          :: { Serialize, Deserialize } ,
 };
 
@@ -169,15 +170,15 @@ impl Message for Show { type Return = i64; }
 service_map!
 (
    namespace  : my_fancy_app_com ;
-   wire_format: ThesWF           ;
+   wire_format: CborWF           ;
    services   : Add, Show        ;
 );
 <span class="boring">}
 </span></code></pre></pre>
 <p>The meaning of the parameters:</p>
 <ul>
-<li><strong>namespace</strong>: this will be transformed into a module in your code. It is useful as well to uniquely distinguish services that might have name collisions otherwise.</li>
-<li><strong>wire_format</strong>: The wire format used for connections that expose this service map, in this case <code>ThesWF</code>, the default implementation provided by <em>thespis_remote</em>.</li>
+<li><strong>namespace</strong>: this will be transformed into a module in your code. It is also used to uniquely identify services to avoid name collisions.</li>
+<li><strong>wire_format</strong>: The wire format used for connections that expose this service map, in this case <code>CborWF</code>, the default implementation provided by <em>thespis_remote</em>.</li>
 <li><strong>services</strong>: The message types that will be served by this service map.</li>
 </ul>
 <p><strong>Usually you will put this macro as well as the message types mentioned in a separate crate that can be compiled into both processes that will communicate to eachother.</strong></p>
@@ -217,13 +218,13 @@ impl Handler&lt; Show &gt; for Sum
 // Create mailbox for our handler and start it using async-std as the executor.
 // The type of addr_handler is `Addr&lt;Sum&gt;`.
 //
-let addr_handler = Addr::builder().start( Sum(0), &amp;AsyncStd )?;
+let addr_handler = Addr::builder().spawn( Sum(0), &amp;AsyncStd )?;
 
 // Create a service map.
 //
 let mut sm = my_fancy_app_com::Services::new();
 
-// Register our handler. In this case one actor will handle both types of messages.
+// Register our handler. In this case the same actor will handle both types of messages.
 //
 sm.register_handler::&lt;Add &gt;( addr_handler.clone_box() );
 sm.register_handler::&lt;Show&gt;( addr_handler.clone_box() );
@@ -251,6 +252,10 @@ assert_eq!( Ok(10), addr.call( Show   ).await );
 <p>To create the <code>RelayMap</code>, you give it a <code>ServiceHandler</code> and a list of <code>ServiceID</code>s that should be relayed. Then you register it as a service map with the Peer that is listening for the incoming requests just as <code>Services</code>.</p>
 <p>The <code>ServiceHandler</code> is an enum that is either an address to a <code>Peer</code> or a closure that will provide an address on a case by case basis. The latter option allows you to do load balancing or other runtime checks/logs before producing the address.</p>
 <p>For a working code example, check the <a href="https://github.com/thespis-rs/thespis_remote/tree/master/examples/relay">relay example</a> for <em>thespis_remote</em>.</p>
+<h1 id="pubsub"><a class="header" href="#pubsub">PubSub</a></h1>
+<ul>
+<li>TODO</li>
+</ul>
 
                     </main>
 

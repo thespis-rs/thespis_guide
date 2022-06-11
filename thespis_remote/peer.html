@@ -76,7 +76,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../actor_model.html"><strong aria-hidden="true">2.</strong> What is the actor model?</a></li><li class="chapter-item expanded "><a href="../what_is_thespis.html"><strong aria-hidden="true">3.</strong> What is thespis?</a></li><li class="chapter-item expanded "><a href="../pitfalls.html"><strong aria-hidden="true">4.</strong> Pitfalls Checklist</a></li><li class="chapter-item expanded "><a href="../local.html"><strong aria-hidden="true">5.</strong> !Send Actors</a></li><li class="chapter-item expanded "><a href="../thespis_impl/thespis_impl.html"><strong aria-hidden="true">6.</strong> thespis_impl</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../thespis_impl/desugar.html"><strong aria-hidden="true">6.1.</strong> Desugar Addr::builder()</a></li><li class="chapter-item expanded "><a href="../thespis_impl/supervision.html"><strong aria-hidden="true">6.2.</strong> Supervising an actor</a></li><li class="chapter-item expanded "><a href="../thespis_impl/concurrent.html"><strong aria-hidden="true">6.3.</strong> Processing messages concurrently</a></li><li class="chapter-item expanded "><a href="../thespis_impl/abstraction.html"><strong aria-hidden="true">6.4.</strong> Abstract the Actor type</a></li><li class="chapter-item expanded "><a href="../thespis_impl/debugging.html"><strong aria-hidden="true">6.5.</strong> Debugging</a></li></ol></li><li class="chapter-item expanded "><a href="../thespis_remote/introduction.html"><strong aria-hidden="true">7.</strong> thespis_remote</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../thespis_remote/service_map.html"><strong aria-hidden="true">7.1.</strong> ServiceMap</a></li><li class="chapter-item expanded "><a href="../thespis_remote/peer.html" class="active"><strong aria-hidden="true">7.2.</strong> Peer</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../actor_model.html"><strong aria-hidden="true">2.</strong> What is the actor model?</a></li><li class="chapter-item expanded "><a href="../what_is_thespis.html"><strong aria-hidden="true">3.</strong> What is thespis?</a></li><li class="chapter-item expanded "><a href="../pitfalls.html"><strong aria-hidden="true">4.</strong> Pitfalls Checklist</a></li><li class="chapter-item expanded "><a href="../local.html"><strong aria-hidden="true">5.</strong> !Send Actors</a></li><li class="chapter-item expanded "><a href="../thespis_impl/thespis_impl.html"><strong aria-hidden="true">6.</strong> thespis_impl</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../thespis_impl/desugar.html"><strong aria-hidden="true">6.1.</strong> Desugar Addr::builder()</a></li><li class="chapter-item expanded "><a href="../thespis_impl/supervision.html"><strong aria-hidden="true">6.2.</strong> Supervising an actor</a></li><li class="chapter-item expanded "><a href="../thespis_impl/concurrent.html"><strong aria-hidden="true">6.3.</strong> Processing messages concurrently</a></li><li class="chapter-item expanded "><a href="../thespis_impl/abstraction.html"><strong aria-hidden="true">6.4.</strong> Abstract the Actor type</a></li><li class="chapter-item expanded "><a href="../thespis_impl/debugging.html"><strong aria-hidden="true">6.5.</strong> Debugging</a></li><li class="chapter-item expanded "><a href="../thespis_impl/backpressure.html"><strong aria-hidden="true">6.6.</strong> Backpressure</a></li></ol></li><li class="chapter-item expanded "><a href="../thespis_remote/introduction.html"><strong aria-hidden="true">7.</strong> thespis_remote</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../thespis_remote/service_map.html"><strong aria-hidden="true">7.1.</strong> ServiceMap</a></li><li class="chapter-item expanded "><a href="../thespis_remote/peer.html" class="active"><strong aria-hidden="true">7.2.</strong> Peer</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -136,6 +136,66 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="peer"><a class="header" href="#peer">Peer</a></h1>
+<p>The <code>Peer</code> is the workhorse of <em>thespis_remote</em>. It manages a connection for you once you give it an <code>Stream + Sink</code> of the wireformat. It is generic over a <code>WireFormat</code>.</p>
+<p>On the incoming path what it does looks like:</p>
+<ol>
+<li>It spawns a loop that reads incoming messages from the connection and deserializes them into the wire format struct. If then looks at what type of message it is to apply back pressure to calls but no to other types of message.</li>
+<li>This loop sends those to the <code>Peer</code> as messages, as the peer is an actor.</li>
+<li>Unless the message is an error or a reponse to a request we made, we look up if we have a service map that handles this message type. We then spawn a task and tell the service map to deliver the message. This prevents the <code>Peer</code> from being blocked while a message is being processed. It means it can still process outgoing messages as well as process several incoming messages concurrently.</li>
+</ol>
+<p>When an outgoing message is a call (request/response) the peer will send a oneshot channel back to the caller. Next it will store the sender of that channel with the <code>ConnID</code>, which later allows detecting that an incoming message is a response to this request and send the answer through the oneshot channel.</p>
+<p><code>Peer</code> does not do connection management like reconnect on loss etc. It is observable and will emit an event if the connection closes. It's up to you to handle that and potentially reconnect.</p>
+<p>The easiest way to create the peer is from an <code>AsyncRead</code>/<code>AsyncWrite</code>. Wireformats must have a method for that. Lets have a look:</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use 
+{
+	async_executors::AsyncStd,
+	thespis_remote::{ CborWf },
+};
+
+let (peer, peer_mb, peer_addr) = CborWF::create_peer
+( 
+	&quot;server&quot;             , // a name for this connection
+	tcp_connection       , // A transport that implements AsyncRead/AsyncWrite
+	1024                 , // Max read message size for the codec (in bytes)
+	1024                 , // Max write message size for the codec (in bytes)
+	Arc::new( AsyncStd ) , // An executor to spawn tasks
+	None                 , // an optional semaphore for backpressure
+	None                 , // an optional grace period to finish outstanding tasks when closing down
+
+).expect( &quot;create peer&quot; );
+<span class="boring">}
+</span></code></pre></pre>
+<p>See the documentation on the WireFormat trait for some more explanation. You can also use the slightly more low level <code>Peer::new</code> if you want more control. That expects a <code>Stream</code>/<code>Sink</code> of the wire format as well as 2 thespis addresses. One for incoming messages and one for outgoing messages, as it allows you to set up a priority queue with the <code>futures::stream::select_with_strategy</code> combinator making sure outgoing messages are prioritized. This is especially useful if your process accepts requests to improve latency and lower memory consumption. It can also lower the risk of deadlocks, but that will be further explained in the chapter on backpressure.</p>
+<p>Once the peer is created as shown above, we can continue the example from the chapter on <code>ServiceMap</code>.</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use 
+{
+	async_executors::AsyncStd,
+	std::sync::Arc,
+};
+
+// Register service map with peer
+//
+peer.register_services( Arc::new( sm ) );
+
+// Start the peer actor
+//
+let peer_handle = AsyncStd.spawn_handle( peer_mb.start(peer) ).expect( &quot;start mailbox of Peer&quot; );
+
+// Wait for the connection to close, which will automatically stop the peer.
+//
+peer_handle.await;
+
+<span class="boring">}
+</span></code></pre></pre>
+<h2 id="backpressure"><a class="header" href="#backpressure">Backpressure</a></h2>
+<p><code>Peer</code> is a gateway in the sense described in the <a href="https://thespis-rs.github.io/thespis_guide/thespis_impl/backpressure.html">earlier chapter on backpressure</a>. It uses both a semaphore as well as a priority channel. </p>
+<p>Further more <code>Peer</code> spawns a new task for each incoming message. This guarantees it doesn't deadlock. As processing messages is asynchronous, and might even be relayed to other processes, this also means we can keep processing incoming messages concurrently rather than blocking and doing it serially.</p>
 
                     </main>
 

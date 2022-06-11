@@ -77,7 +77,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="actor_model.html"><strong aria-hidden="true">2.</strong> What is the actor model?</a></li><li class="chapter-item expanded "><a href="what_is_thespis.html"><strong aria-hidden="true">3.</strong> What is thespis?</a></li><li class="chapter-item expanded "><a href="pitfalls.html"><strong aria-hidden="true">4.</strong> Pitfalls Checklist</a></li><li class="chapter-item expanded "><a href="local.html"><strong aria-hidden="true">5.</strong> !Send Actors</a></li><li class="chapter-item expanded "><a href="thespis_impl/thespis_impl.html"><strong aria-hidden="true">6.</strong> thespis_impl</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="thespis_impl/desugar.html"><strong aria-hidden="true">6.1.</strong> Desugar Addr::builder()</a></li><li class="chapter-item expanded "><a href="thespis_impl/supervision.html"><strong aria-hidden="true">6.2.</strong> Supervising an actor</a></li><li class="chapter-item expanded "><a href="thespis_impl/concurrent.html"><strong aria-hidden="true">6.3.</strong> Processing messages concurrently</a></li><li class="chapter-item expanded "><a href="thespis_impl/abstraction.html"><strong aria-hidden="true">6.4.</strong> Abstract the Actor type</a></li><li class="chapter-item expanded "><a href="thespis_impl/debugging.html"><strong aria-hidden="true">6.5.</strong> Debugging</a></li></ol></li><li class="chapter-item expanded "><a href="thespis_remote/introduction.html"><strong aria-hidden="true">7.</strong> thespis_remote</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="thespis_remote/service_map.html"><strong aria-hidden="true">7.1.</strong> ServiceMap</a></li><li class="chapter-item expanded "><a href="thespis_remote/peer.html"><strong aria-hidden="true">7.2.</strong> Peer</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="actor_model.html"><strong aria-hidden="true">2.</strong> What is the actor model?</a></li><li class="chapter-item expanded "><a href="what_is_thespis.html"><strong aria-hidden="true">3.</strong> What is thespis?</a></li><li class="chapter-item expanded "><a href="pitfalls.html"><strong aria-hidden="true">4.</strong> Pitfalls Checklist</a></li><li class="chapter-item expanded "><a href="local.html"><strong aria-hidden="true">5.</strong> !Send Actors</a></li><li class="chapter-item expanded "><a href="thespis_impl/thespis_impl.html"><strong aria-hidden="true">6.</strong> thespis_impl</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="thespis_impl/desugar.html"><strong aria-hidden="true">6.1.</strong> Desugar Addr::builder()</a></li><li class="chapter-item expanded "><a href="thespis_impl/supervision.html"><strong aria-hidden="true">6.2.</strong> Supervising an actor</a></li><li class="chapter-item expanded "><a href="thespis_impl/concurrent.html"><strong aria-hidden="true">6.3.</strong> Processing messages concurrently</a></li><li class="chapter-item expanded "><a href="thespis_impl/abstraction.html"><strong aria-hidden="true">6.4.</strong> Abstract the Actor type</a></li><li class="chapter-item expanded "><a href="thespis_impl/debugging.html"><strong aria-hidden="true">6.5.</strong> Debugging</a></li><li class="chapter-item expanded "><a href="thespis_impl/backpressure.html"><strong aria-hidden="true">6.6.</strong> Backpressure</a></li></ol></li><li class="chapter-item expanded "><a href="thespis_remote/introduction.html"><strong aria-hidden="true">7.</strong> thespis_remote</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="thespis_remote/service_map.html"><strong aria-hidden="true">7.1.</strong> ServiceMap</a></li><li class="chapter-item expanded "><a href="thespis_remote/peer.html"><strong aria-hidden="true">7.2.</strong> Peer</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -179,11 +179,12 @@
 <li><strong>executor agnostic</strong></li>
 <li><strong>well tested and documented</strong></li>
 </ul>
+<p>In thespis, interface and implementation are 2 different libraries. The idea is that the interface defines the contract of what an actor is in terms of the Rust type system, but that you can swap out the implementation with something else yet remain compatible with other code that uses actors. You could for example write an implementation which uses actix under the hood if you wanted to create interop.</p>
+<p>It also means that a library that wants to expose an actor API does not need to depend on the implementation, just the interface to implement the appropriate traits.</p>
 <h1 id="whats-missing"><a class="header" href="#whats-missing">What's missing</a></h1>
 <ul>
 <li><strong>skipping messages</strong>: The actor doesn't have access to the queue of messages. It can't observe them and decide what to process next. You could of course implement this by having a channel that allows for inspection of what's in it's buffer, but the <code>Mailbox</code> of <code>thespis_impl</code> does not deal with this for you.</li>
 </ul>
-<p>In thespis, interface and implementation are 2 different libraries. The idea is that the interface defines the contract of what an actor is in terms of the Rust type system, but that you can swap out the implementation with something else yet remain compatible with other code that uses actors. You could for example write an implementation which uses actix under the hood if you wanted to create interop.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="pitfalls-checklist"><a class="header" href="#pitfalls-checklist">Pitfalls Checklist</a></h1>
 <p>The actor model is a very convenient programming paradigm. It automatically solves many of the harder problems in concurrent software design. However, there are a few pitfalls, so here is a check list of things the compiler won't catch for us:</p>
 <h2 id="1deadlocks"><a class="header" href="#1deadlocks">1.Deadlocks</a></h2>
@@ -191,7 +192,7 @@
 <p>As actors only process one message at a time. If you have a cyclic dependency, your program can deadlock. That is if actor A depends on actor B to to process it's message, but in order to process A's request B also needs to call back A, both actors will deadlock, as they are waiting on each other and will no longer process any messages ever after.</p>
 <p>You can run into this problem through intermediate actors, so A and B might not be calling each other directly.</p>
 <p>You can also run into this problem with a single actor when using bounded channels. If the mailbox of the actor is currently full and it sends itself a message, it will deadlock. You should generally spawn such a send to avoid blocking processing of the current message.</p>
-<p>Another deadlock issue can arise when an actor is the gatekeeper of a connection (to the network or other components). That is if the mailbox of one actor accumulates both incoming and outgoing messages. If incoming messages saturate the system, and fill up the gatekeeper's mailbox, no responses can flow out. Hence no place is made for new incoming messages and everything blocks. You might want to read up on this issue <a href="https://elizarov.medium.com/deadlocks-in-non-hierarchical-csp-e5910d137cc">in this article</a> which has some nice diagrams to explain the problem and <a href="https://trio.discourse.group/t/sizing-the-channel-deadlock-freedom-vs-back-pressure">on the trio forum</a>. This problem can be solved by not using the channels for backpressure, or by using a priority channel. <em>Thespis_impl</em> has <a href="https://github.com/thespis-rs/thespis_impl/blob/dev/examples/deadlock_prio.rs">an example</a> demonstrating this last solution.</p>
+<p>Another deadlock issue can arise when an actor is the gatekeeper of a connection (to the network or other components). That is if the mailbox of one actor accumulates both incoming and outgoing messages. If incoming messages saturate the system, and fill up the gatekeeper's mailbox, no responses can flow out. Hence no place is made for new incoming messages and everything blocks. You might want to read up on this issue <a href="https://elizarov.medium.com/deadlocks-in-non-hierarchical-csp-e5910d137cc">in this article</a> which has some nice diagrams to explain the problem and <a href="https://trio.discourse.group/t/sizing-the-channel-deadlock-freedom-vs-back-pressure">on the trio forum</a>. This problem can be solved by not using the channels for backpressure, or by using a priority channel. <em>Thespis_impl</em> has <a href="https://github.com/thespis-rs/thespis_impl/blob/dev/examples/deadlock_prio.rs">an example</a> demonstrating this last solution. Note that by using a priority channel, there is no need for unbounded channels.</p>
 <h2 id="2-memory-consumption"><a class="header" href="#2-memory-consumption">2. Memory consumption</a></h2>
 <p>The actor model has highly concurrent message passing. If many messages are in flight, they will all consume memory. The most obvious risk is having unbounded channels to communicate between address and mailbox. If there is no back pressure, the unbounded channel can use unbounded amounts of memory.</p>
 <p>But even with bounded channels you want to keep an eye on memory consumption. If you spawn large volumes of actors, you probably want to use a channel that doesn't allocate it's full capacity. Channels based on linked lists rather than array buffers could potentially reduce a lot of memory consumption.</p>
@@ -942,13 +943,25 @@ impl&lt;T&gt; AddressFooBar for T
 ;
 <span class="boring">}
 </span></code></pre></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="backpressure"><a class="header" href="#backpressure">Backpressure</a></h1>
+<p>Backpressure is an important concept in asynchronous message based systems. Backpressure allows receivers to slow down senders when they cannot process messages/requests fast enough. This limits the memory consumption and improves latency.</p>
+<p>The most basic form of back pressure in thespis can be achieved by using bounded channels for mailboxes. This will make sender tasks wait before putting messages in a mailbox that is full. Thereby slowing down parts of the process that are outpacing other parts. There is a number of situations in which this can work well, but there is one particular trap. By creating a circular shape with one actor acting as a gate to the outside world, receiving and sending to the outside, you can create a deadlock.</p>
+<p>The issue is described at length with illustrations in <a href="https://elizarov.medium.com/deadlocks-in-non-hierarchical-csp-e5910d137cc">this article</a>. Please go read that and then come back.</p>
+<p>The solution to this problem in it's simplest form is indeed to have a separate outgoing queue for the gateway actor. In thespis this is relatively simple with the use of <code>futures::stream::select_with_strategy</code>. There is also a demonstration of this in the <a href="https://github.com/thespis-rs/thespis_impl/blob/dev/examples/deadlock_prio.rs">examples directory</a>.</p>
+<p>However, this is only the most simple form of this problem. This is a closed circuit with one node that acts as a gateway. Eg. manages the incoming and outgoing messages. So when we have a priority queue, the incoming messages do not fill up the outgoing queue and as soon as the processing actor (or pipeline for that matter) can offload a response, they will get a new message from their mailbox. This free slot will propagate all the way back to the gateway. The gateway can now offload the current message to the processing actor and will now processe the outgoing message first (as it'a priority queue). Thus, the system cannot deadlock.</p>
+<p>However imagine the gateway is a client connection to our server. And imagine we can have more than 1 client connected at the same time (well, it's a big motivator for async architecture, isn't it). Now our solution no longer works. As now all the client connections are competing for new free slots in the processing actor/pipeline. If it so happens that the gateway which received outgoing messages in their outgoing queue loses this competition, it's possible that their outgoing queue fills up and hopla. Deadlock 2.0.</p>
+<p>A solution for this problem is to forgo the mailboxes for back pressure and to use a separate system, like a semaphore. Gateways need permits before sending more requests into the system. This works, but it's not trivial to define exactly what is the right number of permits here, especially if someone might come along later and change the architecture of the system.</p>
+<p>Also, it only solves our exact problem. Yes, things can get worse. What if the processing pipeline isn't exactly linear, but a complex application? What if some of those actors can actually create new messages that end up in the system? You'd have to make absolutely sure that they reserve a slot in the semaphore before doing so, if not the semaphore no longer accurately keeps track of the number of messages that are currently in the system. What if they can create new actors? </p>
+<p>An oft suggested solution to all of this is to use unbounded channels. There are however several problems with them. First of all, it means no more backpressure. In itself that's fine as we established that using the mailbox as a backpressure mechanism in this case is a bad idea. However more fundamentally the problem is that unbounded channels don't exist. They would require unbounded memory, which most systems don't have, as well as create unbounded latency which is generally not desirable. </p>
+<p>Another solution is to let the gateway spawn a new task for every incoming message, making it completely resistant against this type of deadlock. However here an external back pressure mechanism like a semaphore becomes really important, otherwise we have a situation similar to unbounded channels, which doesn't really work.</p>
+<p>There is in my opinion no one size fits all solution here. You must carefully think your architecture through, and be conscious about your queue-sizes.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="introduction-to-thespis_remote"><a class="header" href="#introduction-to-thespis_remote">Introduction to thespis_remote.</a></h1>
 <p><em>Thespis_remote</em> adds support for remote actors to the thespis actor model. It follows the same rather low level approach as the rest of <em>thespis</em>. That means it provides the ability to send actor messages over one connection. The connection <em>thespis_remote</em> works over is a <code>Sink</code> and <code>Stream</code> of a given wire format. The wire format has an encoder/decoder so works over anything that implements <code>AsyncRead</code>/<code>AsyncWrite</code>.</p>
 <p>There is no &quot;system&quot; or service discovery integrated. It requires you to connect two processes by any means of your choice and provide the above interfaces to <em>thespis_remote</em>. From there <em>thespis_remote</em> provides:</p>
 <ul>
-<li><code>RemoteAddr</code> which allows you to send messages as if you were sending to an actor in the same process (only difference, <code>send</code> does not guarantee in order delivery).</li>
+<li><code>RemoteAddr</code> which allows you to send messages as if you were sending to an actor in the same process (only difference, <code>send</code> does not guarantee in order delivery within the remote process).</li>
 <li><code>ServiceMap</code>, a trait and provided reference impl that knows how to deserialize your actor messages and dispatch them to the right actor. Note that you can only set one actor per message type per service map, so you are actually sending to a remote process rather than to an individual actor in that process. However you can easily wrap your message with an actor id and provide more precise delivery if you want.</li>
-<li><code>WireFormat</code>, a trait and reference impl for the actual wire format used.</li>
+<li><code>WireFormat</code>, a trait and reference impl (using CBOR) for the actual wire format used.</li>
 <li><code>Peer</code>, an actor that manages a connection endpoint. You provide it with a service map to &quot;serve&quot; over the connection and for sending messages, you pass it's address to the constructor of <code>RemoteAddr</code>, implying that you know that the other side of the connection managed by this <code>Peer</code> exposes these services. This last part is the only thing we cannot guarantee in the type system, as the compiler does not know about the process on the other end of your connection.</li>
 </ul>
 <p>These are the four core components of the library.</p>
@@ -964,19 +977,20 @@ impl&lt;T&gt; AddressFooBar for T
 <div style="break-before: page; page-break-before: always;"></div><h1 id="servicemap"><a class="header" href="#servicemap">ServiceMap</a></h1>
 <p>A service map is a type that knows how to deliver messages to individual actors. It dispatches if you will. You can tell <code>Peer</code> to expose a set of services remotely by bundling them in a <code>ServiceMap</code> and registering that map.</p>
 <p>This makes it possible to expose different sets of services on different connections. For the moment it is not possible to dynamically change what services are exposed at runtime. The problem here is that we consider the service map a contract between two processes, so if all of a sudden we would stop providing certain services, the remote process might run into errors. This might change in the future, with some thought of how we inform a remote process of what services are available at any given time. One purpose might be to deal with authentication, enabling certain services only once a user has authenticated. However for now you have to deal with authentication yourself by adding a token in your messages. The receiving actor doesn't actually know which connection a message comes from.</p>
-<p>There are two implementations of <code>ServiceMap</code> provided by <em>thespis_remote</em>:</p>
+<p>There are three implementations of <code>ServiceMap</code> provided by <em>thespis_remote</em>:</p>
 <ul>
 <li><code>service_map!</code>, a macro</li>
 <li><code>RelayMap</code>, used for relaying messages to a different process.</li>
+<li><code>PubSub</code>, for relays to implement a publish/subscribe architecture.</li>
 </ul>
 <h2 id="service_map"><a class="header" href="#service_map"><code>service_map!</code></a></h2>
-<p>This is a macro because as it needs to deserialize your actor messages, it needs to know it's types, but that can only be provided inside your crate, not in <em>thespis_remote</em>. Thus it gives you all that functionality that needs to be in your crate to make things convenient and you wouldn't have to write that yourself. It's main use looks like:</p>
+<p>This is a macro because as it needs to deserialize your actor messages, it needs to know it's types, but that can only be provided inside your crate, not in <em>thespis_remote</em>. Thus it gives you all that functionality that needs to be in your crate to make things convenient so you don't have to write that yourself. It's main use looks like:</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>use
 {
-   thespis_remote :: { ThesWF, service_map    } ,
+   thespis_remote :: { CborWF, service_map    } ,
    serde          :: { Serialize, Deserialize } ,
 };
 
@@ -995,15 +1009,15 @@ impl Message for Show { type Return = i64; }
 service_map!
 (
    namespace  : my_fancy_app_com ;
-   wire_format: ThesWF           ;
+   wire_format: CborWF           ;
    services   : Add, Show        ;
 );
 <span class="boring">}
 </span></code></pre></pre>
 <p>The meaning of the parameters:</p>
 <ul>
-<li><strong>namespace</strong>: this will be transformed into a module in your code. It is useful as well to uniquely distinguish services that might have name collisions otherwise.</li>
-<li><strong>wire_format</strong>: The wire format used for connections that expose this service map, in this case <code>ThesWF</code>, the default implementation provided by <em>thespis_remote</em>.</li>
+<li><strong>namespace</strong>: this will be transformed into a module in your code. It is also used to uniquely identify services to avoid name collisions.</li>
+<li><strong>wire_format</strong>: The wire format used for connections that expose this service map, in this case <code>CborWF</code>, the default implementation provided by <em>thespis_remote</em>.</li>
 <li><strong>services</strong>: The message types that will be served by this service map.</li>
 </ul>
 <p><strong>Usually you will put this macro as well as the message types mentioned in a separate crate that can be compiled into both processes that will communicate to eachother.</strong></p>
@@ -1043,13 +1057,13 @@ impl Handler&lt; Show &gt; for Sum
 // Create mailbox for our handler and start it using async-std as the executor.
 // The type of addr_handler is `Addr&lt;Sum&gt;`.
 //
-let addr_handler = Addr::builder().start( Sum(0), &amp;AsyncStd )?;
+let addr_handler = Addr::builder().spawn( Sum(0), &amp;AsyncStd )?;
 
 // Create a service map.
 //
 let mut sm = my_fancy_app_com::Services::new();
 
-// Register our handler. In this case one actor will handle both types of messages.
+// Register our handler. In this case the same actor will handle both types of messages.
 //
 sm.register_handler::&lt;Add &gt;( addr_handler.clone_box() );
 sm.register_handler::&lt;Show&gt;( addr_handler.clone_box() );
@@ -1077,7 +1091,71 @@ assert_eq!( Ok(10), addr.call( Show   ).await );
 <p>To create the <code>RelayMap</code>, you give it a <code>ServiceHandler</code> and a list of <code>ServiceID</code>s that should be relayed. Then you register it as a service map with the Peer that is listening for the incoming requests just as <code>Services</code>.</p>
 <p>The <code>ServiceHandler</code> is an enum that is either an address to a <code>Peer</code> or a closure that will provide an address on a case by case basis. The latter option allows you to do load balancing or other runtime checks/logs before producing the address.</p>
 <p>For a working code example, check the <a href="https://github.com/thespis-rs/thespis_remote/tree/master/examples/relay">relay example</a> for <em>thespis_remote</em>.</p>
+<h1 id="pubsub"><a class="header" href="#pubsub">PubSub</a></h1>
+<ul>
+<li>TODO</li>
+</ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="peer"><a class="header" href="#peer">Peer</a></h1>
+<p>The <code>Peer</code> is the workhorse of <em>thespis_remote</em>. It manages a connection for you once you give it an <code>Stream + Sink</code> of the wireformat. It is generic over a <code>WireFormat</code>.</p>
+<p>On the incoming path what it does looks like:</p>
+<ol>
+<li>It spawns a loop that reads incoming messages from the connection and deserializes them into the wire format struct. If then looks at what type of message it is to apply back pressure to calls but no to other types of message.</li>
+<li>This loop sends those to the <code>Peer</code> as messages, as the peer is an actor.</li>
+<li>Unless the message is an error or a reponse to a request we made, we look up if we have a service map that handles this message type. We then spawn a task and tell the service map to deliver the message. This prevents the <code>Peer</code> from being blocked while a message is being processed. It means it can still process outgoing messages as well as process several incoming messages concurrently.</li>
+</ol>
+<p>When an outgoing message is a call (request/response) the peer will send a oneshot channel back to the caller. Next it will store the sender of that channel with the <code>ConnID</code>, which later allows detecting that an incoming message is a response to this request and send the answer through the oneshot channel.</p>
+<p><code>Peer</code> does not do connection management like reconnect on loss etc. It is observable and will emit an event if the connection closes. It's up to you to handle that and potentially reconnect.</p>
+<p>The easiest way to create the peer is from an <code>AsyncRead</code>/<code>AsyncWrite</code>. Wireformats must have a method for that. Lets have a look:</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use 
+{
+	async_executors::AsyncStd,
+	thespis_remote::{ CborWf },
+};
+
+let (peer, peer_mb, peer_addr) = CborWF::create_peer
+( 
+	&quot;server&quot;             , // a name for this connection
+	tcp_connection       , // A transport that implements AsyncRead/AsyncWrite
+	1024                 , // Max read message size for the codec (in bytes)
+	1024                 , // Max write message size for the codec (in bytes)
+	Arc::new( AsyncStd ) , // An executor to spawn tasks
+	None                 , // an optional semaphore for backpressure
+	None                 , // an optional grace period to finish outstanding tasks when closing down
+
+).expect( &quot;create peer&quot; );
+<span class="boring">}
+</span></code></pre></pre>
+<p>See the documentation on the WireFormat trait for some more explanation. You can also use the slightly more low level <code>Peer::new</code> if you want more control. That expects a <code>Stream</code>/<code>Sink</code> of the wire format as well as 2 thespis addresses. One for incoming messages and one for outgoing messages, as it allows you to set up a priority queue with the <code>futures::stream::select_with_strategy</code> combinator making sure outgoing messages are prioritized. This is especially useful if your process accepts requests to improve latency and lower memory consumption. It can also lower the risk of deadlocks, but that will be further explained in the chapter on backpressure.</p>
+<p>Once the peer is created as shown above, we can continue the example from the chapter on <code>ServiceMap</code>.</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use 
+{
+	async_executors::AsyncStd,
+	std::sync::Arc,
+};
+
+// Register service map with peer
+//
+peer.register_services( Arc::new( sm ) );
+
+// Start the peer actor
+//
+let peer_handle = AsyncStd.spawn_handle( peer_mb.start(peer) ).expect( &quot;start mailbox of Peer&quot; );
+
+// Wait for the connection to close, which will automatically stop the peer.
+//
+peer_handle.await;
+
+<span class="boring">}
+</span></code></pre></pre>
+<h2 id="backpressure-1"><a class="header" href="#backpressure-1">Backpressure</a></h2>
+<p><code>Peer</code> is a gateway in the sense described in the <a href="https://thespis-rs.github.io/thespis_guide/thespis_impl/backpressure.html">earlier chapter on backpressure</a>. It uses both a semaphore as well as a priority channel. </p>
+<p>Further more <code>Peer</code> spawns a new task for each incoming message. This guarantees it doesn't deadlock. As processing messages is asynchronous, and might even be relayed to other processes, this also means we can keep processing incoming messages concurrently rather than blocking and doing it serially.</p>
 
                     </main>
 
