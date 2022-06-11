@@ -4,20 +4,21 @@ A service map is a type that knows how to deliver messages to individual actors.
 
 This makes it possible to expose different sets of services on different connections. For the moment it is not possible to dynamically change what services are exposed at runtime. The problem here is that we consider the service map a contract between two processes, so if all of a sudden we would stop providing certain services, the remote process might run into errors. This might change in the future, with some thought of how we inform a remote process of what services are available at any given time. One purpose might be to deal with authentication, enabling certain services only once a user has authenticated. However for now you have to deal with authentication yourself by adding a token in your messages. The receiving actor doesn't actually know which connection a message comes from.
 
-There are two implementations of `ServiceMap` provided by _thespis_remote_:
+There are three implementations of `ServiceMap` provided by _thespis_remote_:
 
 - `service_map!`, a macro
 - `RelayMap`, used for relaying messages to a different process.
+- `PubSub`, for relays to implement a publish/subscribe architecture.
 
 
 ## `service_map!`
 
-This is a macro because as it needs to deserialize your actor messages, it needs to know it's types, but that can only be provided inside your crate, not in _thespis_remote_. Thus it gives you all that functionality that needs to be in your crate to make things convenient and you wouldn't have to write that yourself. It's main use looks like:
+This is a macro because as it needs to deserialize your actor messages, it needs to know it's types, but that can only be provided inside your crate, not in _thespis_remote_. Thus it gives you all that functionality that needs to be in your crate to make things convenient so you don't have to write that yourself. It's main use looks like:
 
 ```rust
 use
 {
-   thespis_remote :: { ThesWF, service_map    } ,
+   thespis_remote :: { CborWF, service_map    } ,
    serde          :: { Serialize, Deserialize } ,
 };
 
@@ -36,14 +37,14 @@ impl Message for Show { type Return = i64; }
 service_map!
 (
    namespace  : my_fancy_app_com ;
-   wire_format: ThesWF           ;
+   wire_format: CborWF           ;
    services   : Add, Show        ;
 );
 ```
 
 The meaning of the parameters:
-- **namespace**: this will be transformed into a module in your code. It is useful as well to uniquely distinguish services that might have name collisions otherwise.
-- **wire_format**: The wire format used for connections that expose this service map, in this case `ThesWF`, the default implementation provided by _thespis_remote_.
+- **namespace**: this will be transformed into a module in your code. It is also used to uniquely identify services to avoid name collisions.
+- **wire_format**: The wire format used for connections that expose this service map, in this case `CborWF`, the default implementation provided by _thespis_remote_.
 - **services**: The message types that will be served by this service map.
 
 **Usually you will put this macro as well as the message types mentioned in a separate crate that can be compiled into both processes that will communicate to eachother.**
@@ -85,13 +86,13 @@ impl Handler< Show > for Sum
 // Create mailbox for our handler and start it using async-std as the executor.
 // The type of addr_handler is `Addr<Sum>`.
 //
-let addr_handler = Addr::builder().start( Sum(0), &AsyncStd )?;
+let addr_handler = Addr::builder().spawn( Sum(0), &AsyncStd )?;
 
 // Create a service map.
 //
 let mut sm = my_fancy_app_com::Services::new();
 
-// Register our handler. In this case one actor will handle both types of messages.
+// Register our handler. In this case the same actor will handle both types of messages.
 //
 sm.register_handler::<Add >( addr_handler.clone_box() );
 sm.register_handler::<Show>( addr_handler.clone_box() );
@@ -123,3 +124,7 @@ To create the `RelayMap`, you give it a `ServiceHandler` and a list of `ServiceI
 The `ServiceHandler` is an enum that is either an address to a `Peer` or a closure that will provide an address on a case by case basis. The latter option allows you to do load balancing or other runtime checks/logs before producing the address.
 
 For a working code example, check the [relay example](https://github.com/thespis-rs/thespis_remote/tree/master/examples/relay) for _thespis_remote_.
+
+# PubSub
+
+- TODO

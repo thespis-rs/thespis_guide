@@ -4,9 +4,9 @@ _Thespis_remote_ adds support for remote actors to the thespis actor model. It f
 
 There is no "system" or service discovery integrated. It requires you to connect two processes by any means of your choice and provide the above interfaces to _thespis_remote_. From there _thespis_remote_ provides:
 
-- `RemoteAddr` which allows you to send messages as if you were sending to an actor in the same process (only difference, `send` does not guarantee in order delivery).
+- `RemoteAddr` which allows you to send messages as if you were sending to an actor in the same process (only difference, `send` does not guarantee in order delivery within the remote process).
 - `ServiceMap`, a trait and provided reference impl that knows how to deserialize your actor messages and dispatch them to the right actor. Note that you can only set one actor per message type per service map, so you are actually sending to a remote process rather than to an individual actor in that process. However you can easily wrap your message with an actor id and provide more precise delivery if you want.
-- `WireFormat`, a trait and reference impl for the actual wire format used.
+- `WireFormat`, a trait and reference impl (using CBOR) for the actual wire format used.
 - `Peer`, an actor that manages a connection endpoint. You provide it with a service map to "serve" over the connection and for sending messages, you pass it's address to the constructor of `RemoteAddr`, implying that you know that the other side of the connection managed by this `Peer` exposes these services. This last part is the only thing we cannot guarantee in the type system, as the compiler does not know about the process on the other end of your connection.
 
 These are the four core components of the library.

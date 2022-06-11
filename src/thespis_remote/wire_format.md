@@ -1,2 +1,0 @@
-# ThesWF: WireFormat
-
