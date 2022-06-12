@@ -7,22 +7,22 @@ on:
 
 jobs:
   deploy:
+
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v2
 
-      - name: Setup mdBook
-        uses: peaceiris/actions-mdbook@v1
+      - name: Build mdbook
+        uses: docker://michaelfbryan/mdbook-docker-image:latest
         with:
-          # mdbook-version: '0.3.7'
-          mdbook-version: 'latest'
-
-      - run: mdbook build
+          entrypoint: ""
+          args: build
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
           deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
-          publish_dir: ./book
+          publish_dir: ./book/html
           user_name: 'github-actions[bot]'
           user_email: 'github-actions[bot]@users.noreply.github.com'

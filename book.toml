@@ -1,8 +1,18 @@
 [book]
-authors      = [ "Naja Melan <najamelan@autistici.org>" ]
-multilingual = false
-src          = "src"
-title        = "Thespis User Guide"
+
+	authors      = [ "Naja Melan <najamelan@autistici.org>" ]
+	multilingual = false
+	src          = "src"
+	title        = "Thespis User Guide"
+
 
 [output.html]
-additional-css = ["custom.css"]
+
+	additional-css = ["custom.css"]
+
+
+[output.linkcheck]
+
+	# Should we check links on the internet? Enabling this option adds a
+	#
+	follow-web-links = false
