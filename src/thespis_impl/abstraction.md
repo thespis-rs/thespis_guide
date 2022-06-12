@@ -41,7 +41,7 @@ Now we can have `Box< dyn AddressFooBar >` and be able to send both `Foo` and `B
 
 Sometimes it's not even known in your library which types of actors and which types of messages you will have to handle, because they are user defined. Yet you still need to store a bunch addresses. You will need some other information at runtime that indicates which type the actor and message are, to enable downcasting.
 
-In this case you can store the addresses as `Box< dyn Any >` and then downcast them at runtime to the right type. We can store a collection eg. `HashMap` of `Box< dyn Any >` and downcast them to `Box< dyn Address<M, E> >`. You will need to store (eg. in the keys of your hashmap) what type you are actually holding to downcast it. See the [recipient_any example](https://github.com/thespis-rs/thespis_remote/tree/master/examples/recipient_any.rs).
+In this case you can store the addresses as `Box< dyn Any >` and then downcast them at runtime to the right type. We can store a collection eg. `HashMap` of `Box< dyn Any >` and downcast them to `Box< dyn Address<M, E> >`. You will need to store (eg. in the keys of your hashmap) what type you are actually holding to downcast it. See the [recipient_any example](https://github.com/thespis-rs/thespis_impl/tree/master/examples/recipient_any.rs).
 
 
 # Cloning trait objects
