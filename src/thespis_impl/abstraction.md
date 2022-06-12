@@ -35,7 +35,7 @@ impl<T> AddressFooBar for T
 {}
 ```
 
-Now we can have `Box< dyn AddressFooBar >` and be able to send both `Foo` and `Bar` messages. The [trait_set](https::crates.io/crates/trait_set) crate can make this more streamlined.
+Now we can have `Box< dyn AddressFooBar >` and be able to send both `Foo` and `Bar` messages. The [trait_set](https://crates.io/crates/trait_set) crate can make this more streamlined.
 
 # Unknown unknowns
 
