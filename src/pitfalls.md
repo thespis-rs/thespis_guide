@@ -4,16 +4,8 @@ The actor model is a very convenient programming paradigm. It automatically solv
 
 
 ## 1.Deadlocks
-
-The original actor model is very simple. If you want to have a request-response type message, you had to send your own address along with the message so the recipient knows how to respond to you. Thanks to Rust's futures, we can easily create a request-response and _thespis_ makes this convenient for you with `Address::call`. However, if you await a response whilst processing a message, a deadlock can arise.
-
-As actors only process one message at a time. If you have a cyclic dependency, your program can deadlock. That is if actor A depends on actor B to to process it's message, but in order to process A's request B also needs to call back A, both actors will deadlock, as they are waiting on each other and will no longer process any messages ever after.
-
-You can run into this problem through intermediate actors, so A and B might not be calling each other directly.
-
-You can also run into this problem with a single actor when using bounded channels. If the mailbox of the actor is currently full and it sends itself a message, it will deadlock. You should generally spawn such a send to avoid blocking processing of the current message.
-
-Another deadlock issue can arise when an actor is the gatekeeper of a connection (to the network or other components). That is if the mailbox of one actor accumulates both incoming and outgoing messages. If incoming messages saturate the system, and fill up the gatekeeper's mailbox, no responses can flow out. Hence no place is made for new incoming messages and everything blocks. You might want to read up on this issue [in this article](https://elizarov.medium.com/deadlocks-in-non-hierarchical-csp-e5910d137cc) which has some nice diagrams to explain the problem and [on the trio forum](https://trio.discourse.group/t/sizing-the-channel-deadlock-freedom-vs-back-pressure). This problem can be solved by not using the channels for backpressure, or by using a priority channel. _Thespis_impl_ has [an example](https://github.com/thespis-rs/thespis_impl/blob/dev/examples/deadlock_prio.rs) demonstrating this last solution. Note that by using a priority channel, there is no need for unbounded channels.
+ 
+As this is a quite involved topic and probably the biggest pitfall in actor system design, please see the next chapter for an extensive discussion.
 
 
 ## 2. Memory consumption

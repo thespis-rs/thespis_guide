@@ -4,6 +4,7 @@
 - [What is the actor model?](actor_model.md)
 - [What is thespis?](what_is_thespis.md)
 - [Pitfalls Checklist](pitfalls.md)
+- [Deadlocks](deadlocks.md)
 - [!Send Actors](local.md)
 
 - [thespis_impl](thespis_impl/thespis_impl.md)
